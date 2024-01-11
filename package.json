@@ -5,7 +5,15 @@
   "main": "main.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon main.js"
+    "build": "tsc",
+    "dev": "cross-env TSX=true tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "cross-env TSX=true tsx watch src/test.n.ts",
+    "lint": "eslint --ext .ts,.tsx src",
+    "migration:new": "db-migrate create --config src/database/migrationConfig.json --migrations-dir src/database/migrations",
+    "migration:run": "db-migrate up --config src/database/migrationConfig.json --migrations-dir src/database/migrations",
+    "migration:revert": "db-migrate down --config src/database/migrationConfig.json --migrations-dir src/database/migrations",
+    "db": "docker exec -it postgres-db psql -U postgres -d socialsync"
   },
   "repository": {
     "type": "git",
