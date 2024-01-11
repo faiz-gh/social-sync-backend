@@ -22,3 +22,9 @@ go.work
 
 # IDE Config Files
 .idea
+
+# Env Files
+.env
+
+# Node Modules
+node_modules
