@@ -10,12 +10,6 @@ const router = Router();
 router.post('/register', AuthController.register);
 
 /**
- * @route POST /auth/verify
- * @description Route for verify user
- */
-router.post('/verify', AuthController.verify);
-
-/**
  * @route POST /auth/login
  * @description Route for login
  */

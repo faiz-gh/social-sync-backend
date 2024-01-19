@@ -19,8 +19,8 @@ exports.up = function(db) {
     CREATE TABLE IF NOT EXISTS users (
       id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
       roleID uuid NOT NULL,
-      firstname character varying NOT NULL,
-      lastname character varying NOT NULL,
+      awsUserID uuid NOT NULL,
+      fullName character varying NOT NULL,
       email character varying NOT NULL,
       password character varying NOT NULL,
       isEmailValidated boolean NOT NULL DEFAULT false,

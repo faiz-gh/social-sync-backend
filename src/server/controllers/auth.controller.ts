@@ -27,27 +27,6 @@ export async function register(req: Request, res: Response, next: NextFunction) 
 }
 
 /**
- * @function verify
- * @description Controller for POST /auth/verify
- */
-export async function verify(req: Request, res: Response, next: NextFunction) {
-    try {
-        RequestValidator(req, {
-            body: Joi.object({
-                email: Joi.string().email().required(),
-                code: Joi.string().required(),
-            }),
-        });
-        const data = await AuthService.verify(
-            req.body as unknown as IVerifyUserRequest
-        );
-        res.json(data);
-    } catch (error) {
-        next(error);
-    }
-}
-
-/**
  * @function login
  * @description Controller for POST /auth/login
  */
@@ -76,12 +55,12 @@ export async function refreshToken(req: Request, res: Response, next: NextFuncti
     try {
         RequestValidator(req, {
             body: Joi.object({
-                aws_user_id: Joi.string().required(),
+                awsUserID: Joi.string().required(),
                 refreshToken: Joi.string().required(),
             }),
         });
         const data = await AuthService.refreshToken(
-            req.body.aws_user_id as string,
+            req.body.awsUserID as string,
             req.body.refreshToken as string
         );
         res.json(data);

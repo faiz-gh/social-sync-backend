@@ -1,6 +1,5 @@
 import {
     ConfirmForgotPasswordCommand,
-    ConfirmSignUpCommand,
     ForgotPasswordCommand,
     GlobalSignOutCommand,
     InitiateAuthCommand,
@@ -40,11 +39,11 @@ export async function register({ fullName, email, password, userRole }: ICreateU
         const result = await cognitoIdentity.send(new SignUpCommand(params));
 
         const userObj: IUserTable = {
-            name: fullName,
+            fullName: fullName,
             password: md5(password),
-            user_role: userRole as 'user' | 'company',
+            roleID: userRole as 'user' | 'company',
             email: email,
-            aws_user_id: result.UserSub,
+            awsUserID: result.UserSub,
         }
 
         const [user] = await dbPool`INSERT INTO users ${dbPool(userObj)} RETURNING *`;
@@ -74,68 +73,6 @@ export async function register({ fullName, email, password, userRole }: ICreateU
         }
         logger.error('Something went wrong creating new user, Please try again.');
         throw new ApiError(403, 'Something went wrong creating new user, Please try again.');
-    }
-}
-
-/**
- * @async
- * @function verify
- * @description Service for POST /auth/verify
- * @param {Object} data
- * @returns Promise<Object>
- */
-export async function verify({ email, code }: IVerifyUserRequest): Promise<DefaultServiceResponse> {
-    const cognitoIdentity = getCognitoIdentity();
-
-    const [userExists] = await dbPool`SELECT * FROM users WHERE email = ${email}`;
-
-    if (!userExists) {
-        logger.error('No user exists with this email');
-        throw new ApiError(403, 'No user exists with this email');
-    }
-
-    const hashSecret = generateHashSecret(email);
-
-    const params = {
-        ClientId: process.env.CLIENT_ID as string,
-        Username: email,
-        ConfirmationCode: code,
-        SecretHash: hashSecret
-    }
-
-    try {
-        await cognitoIdentity.send(new ConfirmSignUpCommand(params));
-        const [user] = await dbPool<IUserTable[]>`UPDATE users SET is_verified = true WHERE email = ${email} RETURNING *`;
-        logger.silly('User verified successfully');
-        return {
-            message: 'User verified successfully',
-            data: user,
-        };
-    } catch (error) {
-        const awsError: IAWSCognitoError = error;
-        console.log(awsError);
-        if (awsError?.name === 'CodeMismatchException') {
-            logger.error('Invalid OTP, Please try again!');
-            throw new ApiError(awsError?.$metadata?.httpStatusCode, 'Invalid OTP, Please try again!');
-        }
-        if (awsError?.name === 'ExpiredCodeException') {
-            logger.error('OTP expired, Please try again!');
-            throw new ApiError(awsError?.$metadata?.httpStatusCode, 'OTP expired, Please try again!');
-        }
-        if (awsError?.name === 'TooManyFailedAttemptsException') {
-            logger.error('Too many failed attempts, Please try again later.');
-            throw new ApiError(awsError?.$metadata?.httpStatusCode, 'Too many failed attempts, Please try again later.');
-        }
-        if (awsError?.name === 'TooManyRequestsException') {
-            logger.error('Too many requests, Please try again later.');
-            throw new ApiError(awsError?.$metadata?.httpStatusCode, 'Too many requests, Please try again later.');
-        }
-        if (awsError?.name === 'UserNotFoundException') {
-            logger.error('User with this email does not exist');
-            throw new ApiError(awsError?.$metadata?.httpStatusCode, 'User with this email does not exist');
-        }
-        logger.error('Something went wrong, Please try again.');
-        throw new ApiError(403, 'Something went wrong, Please try again.');
     }
 }
 
@@ -208,14 +145,14 @@ export async function login({ email, password }: IUserLoginRequest): Promise<Def
  * @async
  * @function refreshToken
  * @description Service for POST /auth/refresh-token
- * @param {string} aws_user_id
+ * @param {string} awsUserID
  * @param {string} refreshToken
  * @returns Promise<Object>
  */
-export async function refreshToken(aws_user_id: string, refreshToken: string): Promise<DefaultServiceResponse> {
+export async function refreshToken(awsUserID: string, refreshToken: string): Promise<DefaultServiceResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
-    const hashSecret = generateHashSecret(aws_user_id);
+    const hashSecret = generateHashSecret(awsUserID);
     const params = {
         AuthFlow: 'REFRESH_TOKEN_AUTH',
         ClientId: process.env.CLIENT_ID as string,
@@ -304,7 +241,7 @@ export async function forgotPassword(email: string): Promise<DefaultServiceRespo
  * @async
  * @function resetPassword
  * @description Service for POST /auth/reset-password
- * @param {string} email
+ * @param {Object} data
  * @returns Promise<Object>
  */
 export async function resetPassword({ email, password, code }: IResetUserPasswordRequest): Promise<DefaultServiceResponse> {

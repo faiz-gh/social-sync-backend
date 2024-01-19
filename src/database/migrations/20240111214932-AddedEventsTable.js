@@ -22,7 +22,7 @@ exports.up = function(db) {
       reminder timestamp NOT NULL DEFAULT now(),
       scheduledAt timestamp NOT NULL DEFAULT now(),
       userID uuid NOT NULL,
-      dateCreated timestamp NOT NULL DEFAULT now(),
+      createdDate timestamp NOT NULL DEFAULT now(),
       lastModified timestamp NOT NULL DEFAULT now(),
       isDeleted boolean NOT NULL DEFAULT false
     );

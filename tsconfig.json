@@ -27,13 +27,13 @@
                 "loggers/*"
             ],
             "@routes/*": [
-                "infrastructure/routes/*"
+                "server/routes/*"
             ],
             "@controllers/*": [
-                "infrastructure/controllers/*"
+                "server/controllers/*"
             ],
             "@services/*": [
-                "infrastructure/services/*"
+                "server/services/*"
             ],
             "@database/*": [
                 "database/*"
