@@ -20,7 +20,7 @@ import md5 from 'md5';
  * @param {Object} data
  * @returns Promise<Object>
  */
-export async function register({ fullName, email, password, userRole }: ICreateUserRequest): Promise<DefaultServiceResponse> {
+export async function register({ fullName, email, password, roleID }: ICreateUserRequest): Promise<DefaultServiceResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
     const userAttr = [];
@@ -39,11 +39,11 @@ export async function register({ fullName, email, password, userRole }: ICreateU
         const result = await cognitoIdentity.send(new SignUpCommand(params));
 
         const userObj: IUserTable = {
-            fullName: fullName,
+            full_name: fullName,
             password: md5(password),
-            roleID: userRole as 'user' | 'company',
+            role_id: roleID,
             email: email,
-            awsUserID: result.UserSub,
+            aws_user_id: result.UserSub,
         }
 
         const [user] = await dbPool`INSERT INTO users ${dbPool(userObj)} RETURNING *`;

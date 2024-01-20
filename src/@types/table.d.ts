@@ -9,16 +9,16 @@ interface IRoleTable {
 
 interface IUserTable {
     id?: string;
-    roleID: string;
-    awsUserID: string;
-    fullName: string;
+    role_id: string;
+    aws_user_id: string;
+    full_name: string;
     email: string;
     password: string;
-    isEmailValidated?: boolean;
-    isActivated?: boolean;
-    createdDate?: Date;
-    lastModified?: Date;
-    isDeleted?: boolean;
+    is_email_validated?: boolean;
+    is_activated?: boolean;
+    created_date?: Date;
+    last_modified?: Date;
+    is_deleted?: boolean;
 }
 
 interface IClientTable {

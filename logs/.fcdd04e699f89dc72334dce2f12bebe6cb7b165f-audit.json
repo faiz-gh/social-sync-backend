@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 30
+    },
+    "auditLog": "logs\\.fcdd04e699f89dc72334dce2f12bebe6cb7b165f-audit.json",
+    "files": [
+        {
+            "date": 1705704689422,
+            "name": "logs\\combined-thinkpad-t590-2024-01-20.log",
+            "hash": "8b36c4689ff3e76ba8b0568f208c1ab54b50d5577d2ad75fe114b5d847c68051"
+        }
+    ],
+    "hashType": "sha256"
+}

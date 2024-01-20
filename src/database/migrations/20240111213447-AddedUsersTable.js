@@ -18,18 +18,18 @@ exports.up = function(db) {
   return db.runSql(`
     CREATE TABLE IF NOT EXISTS users (
       id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-      roleID uuid NOT NULL,
-      awsUserID uuid NOT NULL,
-      fullName character varying NOT NULL,
+      role_id integer NOT NULL,
+      aws_user_id uuid NOT NULL,
+      full_name character varying NOT NULL,
       email character varying NOT NULL,
       password character varying NOT NULL,
-      isEmailValidated boolean NOT NULL DEFAULT false,
-      isActivated boolean NOT NULL DEFAULT false,
-      createdDate timestamp NOT NULL DEFAULT now(),
-      lastModified timestamp NOT NULL DEFAULT now(),
-      isDeleted boolean NOT NULL DEFAULT false
+      is_email_validated boolean NOT NULL DEFAULT false,
+      is_activated boolean NOT NULL DEFAULT false,
+      created_date timestamp NOT NULL DEFAULT now(),
+      last_modified timestamp NOT NULL DEFAULT now(),
+      is_deleted boolean NOT NULL DEFAULT false
     );
-    ALTER TABLE users ADD CONSTRAINT user_role_fk FOREIGN KEY (roleID) REFERENCES roles (id);
+    ALTER TABLE users ADD CONSTRAINT user_role_fk FOREIGN KEY (role_id) REFERENCES roles (id);
     CREATE INDEX users_email_idx ON users (email);
   `);
 };

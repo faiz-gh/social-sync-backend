@@ -12,7 +12,7 @@ declare global {
         fullName: string;
         email: string;
         password: string;
-        userRole: string;
+        roleID: string;
     }
 
     interface IUserLoginRequest {

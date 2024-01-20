@@ -14,7 +14,7 @@ export async function register(req: Request, res: Response, next: NextFunction) 
                 fullName: Joi.string().required(),
                 email: Joi.string().email().required(),
                 password: Joi.string().required(),
-                userRole: Joi.string().valid('user', 'company').required()
+                roleID: Joi.required()
             }),
         });
         const data = await AuthService.register(

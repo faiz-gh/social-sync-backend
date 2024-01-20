@@ -18,13 +18,15 @@ exports.up = function(db) {
   return db.runSql(`
     CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
     CREATE TABLE IF NOT EXISTS roles (
-      id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-      roleName character varying NOT NULL,
+      id serial PRIMARY KEY,
+      role_name character varying NOT NULL,
       description character varying NOT NULL,
-      createdDate timestamp NOT NULL DEFAULT now(),
-      lastModified timestamp NOT NULL DEFAULT now(),
-      isDeleted boolean NOT NULL DEFAULT false
+      created_date timestamp NOT NULL DEFAULT now(),
+      last_modified timestamp NOT NULL DEFAULT now(),
+      is_deleted boolean NOT NULL DEFAULT false
     );
+    
+    INSERT INTO roles (role_name, description) VALUES ('admin', 'Admin Account');
   `);
 };
 
