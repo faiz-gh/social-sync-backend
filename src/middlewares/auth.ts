@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import jwkToPem from 'jwk-to-pem';
-import fetch from 'node-fetch';
 
 const REGION = process.env.POOL_REGION;
 const USER_POOL_ID = process.env.POOL_ID;
@@ -61,6 +60,8 @@ export async function setupPEMS(): Promise<Record<string, string>> {
             throw new Error('Request Not Successful');
         }
         const data = await response.json();
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
         const { keys } = data;
         for (let i = 0; i < keys.length; i++) {
             const key_id = keys[i].kid;

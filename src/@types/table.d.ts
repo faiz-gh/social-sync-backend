@@ -1,10 +1,10 @@
 interface IRoleTable {
     id?: string;
-    roleName: string;
+    role_name: string;
     description: string;
-    createdDate?: Date;
-    lastModified?: Date;
-    isDeleted?: boolean;
+    created_date?: Date;
+    last_modified?: Date;
+    is_deleted?: boolean;
 }
 
 interface IUserTable {
@@ -23,22 +23,22 @@ interface IUserTable {
 
 interface IClientTable {
     id?: string;
-    userID: string;
+    user_id: string;
     name: string;
-    createdDate?: Date;
-    lastModified?: Date;
-    isDeleted?: boolean;
+    created_date?: Date;
+    last_modified?: Date;
+    is_deleted?: boolean;
 }
 
 interface IAccountTable {
     id?: string;
-    clientID: string;
+    client_id: string;
     username: string;
     password: string;
-    apiKey: string;
-    createdDate?: Date;
-    lastModified?: Date;
-    isDeleted?: boolean;
+    api_key: string;
+    created_date?: Date;
+    last_modified?: Date;
+    is_deleted?: boolean;
 }
 
 interface IPostTable {
@@ -46,86 +46,86 @@ interface IPostTable {
     media: string;
     location: string;
     description: string;
-    accountID: string;
-    postSchedule: Date;
-    createdDate?: Date;
-    lastModified?: Date;
-    isDeleted?: boolean;
+    account_id: string;
+    post_schedule: Date;
+    created_date?: Date;
+    last_modified?: Date;
+    is_deleted?: boolean;
 }
 
 interface IAnalyticsTable {
     id?: string;
-    postID: string;
+    post_id: string;
     data: string;
-    createdDate?: Date;
+    created_date?: Date;
 }
 
 interface IChannelTable {
     id?: string;
     subject: string;
-    userID: string;
+    user_id: string;
     members: string;
-    createdDate?: Date;
-    lastModified?: Date;
-    isDeleted?: boolean;
+    created_date?: Date;
+    last_modified?: Date;
+    is_deleted?: boolean;
 }
 
 interface IChatTable {
     id?: string;
     message: string;
-    userID: string;
-    createdDate?: Date;
-    isDeleted?: boolean;
+    user_id: string;
+    created_date?: Date;
+    is_deleted?: boolean;
 }
 
 interface INoteTable {
     id?: string;
     subject: string;
     content: string;
-    userID: string;
-    createdDate?: Date;
-    lastModified?: Date;
-    isDeleted?: boolean;
+    user_id: string;
+    created_date?: Date;
+    last_modified?: Date;
+    is_deleted?: boolean;
 }
 
 interface ITaskTable {
     id: string;
     title: string;
     description: string;
-    userID: string;
-    createdDate?: Date;
-    lastModified?: Date;
-    estimatedTime?: Date;
-    timeTaken?: Date;
-    isCompleted?: boolean;
-    isDeleted?: boolean;
+    user_id: string;
+    created_date?: Date;
+    last_modified?: Date;
+    estimated_time?: Date;
+    time_taken?: Date;
+    is_completed?: boolean;
+    is_deleted?: boolean;
 }
 
 interface IEventTable {
     id: string;
     title: string;
     reminder?: Date;
-    scheduledAt?: Date;
-    userID: string;
-    createdDate?: Date;
-    lastModified?: Date;
-    isDeleted?: boolean;
+    scheduled_at?: Date;
+    user_id: string;
+    created_date?: Date;
+    last_modified?: Date;
+    is_deleted?: boolean;
 }
 
 interface IFeedbackTable {
     id: string;
     subject: string;
     description: string;
-    userID: string;
-    createdDate?: Date;
-    isOpened?: boolean;
-    isDeleted?: boolean;
+    user_id: string;
+    created_date?: Date;
+    is_opened?: boolean;
+    is_deleted?: boolean;
 }
 
 interface IPreferenceTable {
     id: string;
-    userID: string;
+    user_id: string;
     theme: string;
     layout: string;
-    lastModified?: Date;
+    last_modified?: Date;
 }

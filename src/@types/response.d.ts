@@ -21,12 +21,4 @@ declare global {
         hasMore: boolean;
         results: T[];
     }
-
-    interface ICompanyResponse extends ICompanyTable {
-        socialMedia?: ISocialMediaTable[];
-    }
-
-    interface IProfileResponse extends IProfileTable {
-        socialMedia?: ISocialMediaTable[];
-    }
 }
