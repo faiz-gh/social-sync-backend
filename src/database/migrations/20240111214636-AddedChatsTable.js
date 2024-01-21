@@ -19,11 +19,11 @@ exports.up = function(db) {
     CREATE TABLE IF NOT EXISTS chats (
       id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
       message character varying NOT NULL,
-      userID uuid NOT NULL,
-      createdDate timestamp NOT NULL DEFAULT now(),
-      isDeleted boolean NOT NULL DEFAULT false
+      user_id uuid NOT NULL,
+      created_date timestamp NOT NULL DEFAULT now(),
+      is_deleted boolean NOT NULL DEFAULT false
     );
-    ALTER TABLE chats ADD CONSTRAINT chat_user_fk FOREIGN KEY (userID) REFERENCES users (id);
+    ALTER TABLE chats ADD CONSTRAINT chat_user_fk FOREIGN KEY (user_id) REFERENCES users (id);
   `);
 };
 

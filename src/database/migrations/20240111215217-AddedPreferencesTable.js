@@ -18,13 +18,13 @@ exports.up = function(db) {
   return db.runSql(`
     CREATE TABLE IF NOT EXISTS preferences (
       id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-      userID uuid NOT NULL,
+      user_id uuid NOT NULL,
       theme character varying NOT NULL,
       layout character varying NOT NULL,
-      lastModified timestamp NOT NULL DEFAULT now()
+      last_modified timestamp NOT NULL DEFAULT now()
     );
 
-    ALTER TABLE preferences ADD CONSTRAINT preferences_user_fk FOREIGN KEY (userID) REFERENCES users (id);
+    ALTER TABLE preferences ADD CONSTRAINT preferences_user_fk FOREIGN KEY (user_id) REFERENCES users (id);
   `);
 };
 

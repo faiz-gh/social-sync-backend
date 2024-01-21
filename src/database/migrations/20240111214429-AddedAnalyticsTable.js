@@ -18,11 +18,11 @@ exports.up = function(db) {
   return db.runSql(`
     CREATE TABLE IF NOT EXISTS analytics (
       id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-      postID uuid NOT NULL,
+      post_id uuid NOT NULL,
       data json NOT NULL,
-      createdDate timestamp NOT NULL DEFAULT now()
+      created_date timestamp NOT NULL DEFAULT now()
     );
-    ALTER TABLE analytics ADD CONSTRAINT analytics_post_fk FOREIGN KEY (postID) REFERENCES posts (id);
+    ALTER TABLE analytics ADD CONSTRAINT analytics_post_fk FOREIGN KEY (post_id) REFERENCES posts (id);
   `);
 };
 

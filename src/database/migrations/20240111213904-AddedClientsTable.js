@@ -18,13 +18,13 @@ exports.up = function(db) {
   return db.runSql(`
     CREATE TABLE IF NOT EXISTS clients (
       id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-      userID uuid NOT NULL,
+      user_id uuid NOT NULL,
       name character varying NOT NULL,
-      createdDate timestamp NOT NULL DEFAULT now(),
-      lastModified timestamp NOT NULL DEFAULT now(),
-      isDeleted boolean NOT NULL DEFAULT false
+      created_date timestamp NOT NULL DEFAULT now(),
+      last_modified timestamp NOT NULL DEFAULT now(),
+      is_deleted boolean NOT NULL DEFAULT false
     );
-    ALTER TABLE clients ADD CONSTRAINT client_user_fk FOREIGN KEY (userID) REFERENCES users (id);
+    ALTER TABLE clients ADD CONSTRAINT client_user_fk FOREIGN KEY (user_id) REFERENCES users (id);
   `);
 };
 

@@ -21,13 +21,13 @@ exports.up = function(db) {
       media character varying NOT NULL,
       location character varying NOT NULL,
       description character varying NOT NULL,
-      accountID uuid NOT NULL,
-      postSchedule timestamp NOT NULL DEFAULT now(),
-      createdDate timestamp NOT NULL DEFAULT now(),
-      lastModified timestamp NOT NULL DEFAULT now(),
-      isDeleted boolean NOT NULL DEFAULT false
+      account_id uuid NOT NULL,
+      post_schedule timestamp NOT NULL DEFAULT now(),
+      created_date timestamp NOT NULL DEFAULT now(),
+      last_modified timestamp NOT NULL DEFAULT now(),
+      is_deleted boolean NOT NULL DEFAULT false
     );
-    ALTER TABLE posts ADD CONSTRAINT post_account_fk FOREIGN KEY (accountID) REFERENCES accounts (id);
+    ALTER TABLE posts ADD CONSTRAINT post_account_fk FOREIGN KEY (account_id) REFERENCES accounts (id);
   `);
 };
 

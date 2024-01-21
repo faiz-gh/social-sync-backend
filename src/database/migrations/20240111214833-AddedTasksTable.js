@@ -20,15 +20,15 @@ exports.up = function(db) {
       id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
       title character varying NOT NULL,
       description character varying NOT NULL,
-      userID uuid NOT NULL,
-      createdDate timestamp NOT NULL DEFAULT now(),
-      lastModified timestamp NOT NULL DEFAULT now(),
-      estimatedTime timestamp NOT NULL DEFAULT now(),
-      timeTaken timestamp NOT NULL DEFAULT now(),
-      isCompleted boolean NOT NULL DEFAULT false,
-      isDeleted boolean NOT NULL DEFAULT false
+      user_id uuid NOT NULL,
+      created_date timestamp NOT NULL DEFAULT now(),
+      last_modified timestamp NOT NULL DEFAULT now(),
+      estimated_time timestamp NOT NULL DEFAULT now(),
+      time_taken timestamp NOT NULL DEFAULT now(),
+      is_completed boolean NOT NULL DEFAULT false,
+      is_deleted boolean NOT NULL DEFAULT false
     );
-    ALTER TABLE tasks ADD CONSTRAINT task_user_fk FOREIGN KEY (userID) REFERENCES users (id);
+    ALTER TABLE tasks ADD CONSTRAINT task_user_fk FOREIGN KEY (user_id) REFERENCES users (id);
   `);
 };
 

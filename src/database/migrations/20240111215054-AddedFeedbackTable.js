@@ -20,12 +20,12 @@ exports.up = function(db) {
       id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
       subject character varying NOT NULL,
       description character varying NOT NULL,
-      userID uuid NOT NULL,
-      createdDate timestamp NOT NULL DEFAULT now(),
-      isOpened boolean NOT NULL DEFAULT false,
-      isDeleted boolean NOT NULL DEFAULT false
+      user_id uuid NOT NULL,
+      created_date timestamp NOT NULL DEFAULT now(),
+      is_opened boolean NOT NULL DEFAULT false,
+      is_deleted boolean NOT NULL DEFAULT false
     );
-    ALTER TABLE feedback ADD CONSTRAINT feedback_user_fk FOREIGN KEY (userID) REFERENCES users (id);
+    ALTER TABLE feedback ADD CONSTRAINT feedback_user_fk FOREIGN KEY (user_id) REFERENCES users (id);
   `);
 };
 
