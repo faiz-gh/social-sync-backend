@@ -78,16 +78,6 @@ interface IChatTable {
     is_deleted?: boolean;
 }
 
-interface INoteTable {
-    id?: string;
-    subject: string;
-    content: string;
-    user_id: string;
-    created_date?: Date;
-    last_modified?: Date;
-    is_deleted?: boolean;
-}
-
 interface ITaskTable {
     id: string;
     title: string;
