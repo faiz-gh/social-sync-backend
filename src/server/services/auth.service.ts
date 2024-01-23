@@ -20,7 +20,7 @@ import md5 from 'md5';
  * @param {Object} data
  * @returns Promise<Object>
  */
-export async function register({ fullName, email, password, roleID }: ICreateUserRequest): Promise<DefaultServiceResponse> {
+export async function register({ fullName, email, password, roleID }: IRegisterRequest): Promise<DefaultServiceResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
     const userAttr = [];
@@ -83,7 +83,7 @@ export async function register({ fullName, email, password, roleID }: ICreateUse
  * @param {Object} data
  * @returns Promise<Object>
  */
-export async function login({ email, password }: IUserLoginRequest): Promise<DefaultServiceResponse> {
+export async function login({ email, password }: ILoginRequest): Promise<DefaultServiceResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
     const [user] = await dbPool`SELECT * FROM users WHERE email = ${email} AND password = ${md5(password)}`;
@@ -149,7 +149,7 @@ export async function login({ email, password }: IUserLoginRequest): Promise<Def
  * @param {string} refreshToken
  * @returns Promise<Object>
  */
-export async function refreshToken(awsUserID: string, refreshToken: string): Promise<DefaultServiceResponse> {
+export async function refreshToken({ awsUserID, refreshToken }: IRefreshTokenRequest): Promise<DefaultServiceResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
     const hashSecret = generateHashSecret(awsUserID);
@@ -196,7 +196,7 @@ export async function refreshToken(awsUserID: string, refreshToken: string): Pro
  * @param {string} email
  * @returns Promise<Object>
  */
-export async function forgotPassword(email: string): Promise<DefaultServiceResponse> {
+export async function forgotPassword({ email }: IForgotPasswordRequest): Promise<DefaultServiceResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
     const [userExists] = await dbPool`SELECT * FROM users WHERE email = ${email}`;
@@ -244,7 +244,7 @@ export async function forgotPassword(email: string): Promise<DefaultServiceRespo
  * @param {Object} data
  * @returns Promise<Object>
  */
-export async function resetPassword({ email, password, code }: IResetUserPasswordRequest): Promise<DefaultServiceResponse> {
+export async function resetPassword({ email, password, code }: IResetPasswordRequest): Promise<DefaultServiceResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
     const [userExists] = await dbPool`SELECT * FROM users WHERE email = ${email}`;
@@ -309,7 +309,7 @@ export async function resetPassword({ email, password, code }: IResetUserPasswor
  * @param {string} email
  * @returns Promise<Object>
  */
-export async function resendCode(email: string): Promise<DefaultServiceResponse> {
+export async function resendCode({ email }: IResendCodeRequest): Promise<DefaultServiceResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
     const [userExists] = await dbPool`SELECT * FROM users WHERE email = ${email}`;
@@ -357,7 +357,7 @@ export async function resendCode(email: string): Promise<DefaultServiceResponse>
  * @param {string} accessToken
  * @returns Promise<Object>
  */
-export async function logout(accessToken: string): Promise<DefaultServiceResponse> {
+export async function logout({ accessToken }: ILogoutRequest): Promise<DefaultServiceResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
     const params = {
@@ -393,7 +393,7 @@ export async function logout(accessToken: string): Promise<DefaultServiceRespons
  * @param {string} accessToken
  * @returns Promise<Object>
  */
-export async function remove(email: string, accessToken: string): Promise<DefaultServiceResponse> {
+export async function remove({ email, accessToken }: IRemoveUserRequest): Promise<DefaultServiceResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
     const [userExists] = await dbPool<IUserTable[]>`SELECT * FROM users WHERE email = ${email}`;
@@ -402,7 +402,7 @@ export async function remove(email: string, accessToken: string): Promise<Defaul
         throw new ApiError(403, 'No user exists with this email');
     }
 
-    await logout(accessToken);
+    await logout({ accessToken });
 
     const params = {
         ClientId: process.env.CLIENT_ID as string,

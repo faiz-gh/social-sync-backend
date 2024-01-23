@@ -18,7 +18,7 @@ export async function register(req: Request, res: Response, next: NextFunction) 
             }),
         });
         const data = await AuthService.register(
-            req.body as unknown as ICreateUserRequest
+            req.body as IRegisterRequest
         );
         res.json(data);
     } catch (error) {
@@ -39,7 +39,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
             }),
         });
         const data = await AuthService.login(
-            req.body as unknown as IUserLoginRequest
+            req.body as ILoginRequest
         );
         res.json(data);
     } catch (error) {
@@ -60,8 +60,7 @@ export async function refreshToken(req: Request, res: Response, next: NextFuncti
             }),
         });
         const data = await AuthService.refreshToken(
-            req.body.awsUserID as string,
-            req.body.refreshToken as string
+            req.body as IRefreshTokenRequest
         );
         res.json(data);
     } catch (error) {
@@ -81,7 +80,7 @@ export async function forgotPassword(req: Request, res: Response, next: NextFunc
             }),
         });
         const data = await AuthService.forgotPassword(
-            req.body.email as string
+            req.body as IForgotPasswordRequest
         );
         res.json(data);
     } catch (error) {
@@ -103,7 +102,7 @@ export async function resetPassword(req: Request, res: Response, next: NextFunct
             }),
         });
         const data = await AuthService.resetPassword(
-            req.body as IResetUserPasswordRequest
+            req.body as IResetPasswordRequest
         );
         res.json(data);
     } catch (error) {
@@ -123,7 +122,7 @@ export async function resendCode(req: Request, res: Response, next: NextFunction
             }),
         });
         const data = await AuthService.resendCode(
-            req.query.email as string
+            req.query as IResendCodeRequest
         );
         res.json(data);
     } catch (error) {
@@ -143,7 +142,7 @@ export async function logout(req: Request, res: Response, next: NextFunction) {
             }),
         });
         const data = await AuthService.logout(
-            req.body.accessToken as string
+            req.body as ILogoutRequest
         );
         res.json(data);
     } catch (error) {
@@ -164,8 +163,7 @@ export async function remove(req: Request, res: Response, next: NextFunction) {
             }),
         });
         const data = await AuthService.remove(
-            req.body.email as string,
-            req.body.accessToken as string
+            req.body as IRemoveUserRequest
         );
         res.json(data);
     } catch (error) {
