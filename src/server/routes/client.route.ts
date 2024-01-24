@@ -23,10 +23,10 @@ router.put('/', tokenAuthenticated, ClientController.update);
 router.delete('/', tokenAuthenticated, ClientController.remove);
 
 /**
- * @route GET /client/g/:userID
+ * @route GET /client/user/:userID
  * @description Route for getting all clients by User ID
  */
-router.get('/g/:userID', tokenAuthenticated, ClientController.getByUserId);
+router.get('/user/:userID', tokenAuthenticated, ClientController.getByUserId);
 
 /**
  * @route GET /client/:id

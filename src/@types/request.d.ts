@@ -81,6 +81,7 @@ interface IUpdateAccountRequest {
     id: string;
     username: string;
     password: string;
+    apiKey: string;
 }
 
 interface IDeleteAccountRequest {

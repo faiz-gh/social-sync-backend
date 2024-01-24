@@ -66,7 +66,7 @@ export async function remove(req: Request, res: Response, next: NextFunction) {
 }
 
 /**
- * @route GET /g/:userID
+ * @route GET /user/:userID
  * @description Route for getting all clients
  */
 export async function getByUserId(req: Request, res: Response, next: NextFunction) {
@@ -83,12 +83,12 @@ export async function getByUserId(req: Request, res: Response, next: NextFunctio
                 sortDirection: Joi.string().valid('ASC', 'DESC').default('DESC'),
             }),
         });
-        const payload = req.query as unknown as IGetClientsByUserIDRequest;
+        const payload: IGetClientsByUserIDRequest = req.query as unknown as IGetClientsByUserIDRequest;
 
         payload.userID = req.params.userID;
 
         const data = await ClientService.getByUserId(
-            payload as IGetClientsByUserIDRequest
+            payload
         );
         res.json(data);
     } catch (error) {
@@ -108,7 +108,7 @@ export async function getById(req: Request, res: Response, next: NextFunction) {
             }),
         });
         const data = await ClientService.getById(
-            req.query as unknown as IGetClientByIDRequest
+            { id: req.params.id } as IGetClientByIDRequest
         );
         res.json(data);
     } catch (error) {
