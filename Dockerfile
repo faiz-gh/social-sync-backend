@@ -8,6 +8,6 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 4400
+EXPOSE 5500
 
 CMD ["sh", "-c", "npm run migration:run; npm run dev;"]

@@ -6,7 +6,7 @@ services:
     build: .
     restart: unless-stopped
     ports:
-      - "4400:4400"
+      - "5500:5500"
     depends_on:
       db:
         condition: service_healthy
