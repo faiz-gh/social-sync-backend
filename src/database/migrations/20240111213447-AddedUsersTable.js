@@ -23,8 +23,7 @@ exports.up = function(db) {
       full_name character varying NOT NULL,
       email character varying NOT NULL,
       password character varying NOT NULL,
-      is_email_validated boolean NOT NULL DEFAULT false,
-      is_activated boolean NOT NULL DEFAULT false,
+      is_activated boolean NOT NULL DEFAULT true,
       created_date timestamp NOT NULL DEFAULT now(),
       last_modified timestamp NOT NULL DEFAULT now(),
       is_deleted boolean NOT NULL DEFAULT false

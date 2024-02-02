@@ -14,7 +14,6 @@ interface IUserTable {
     full_name: string;
     email: string;
     password: string;
-    is_email_validated?: boolean;
     is_activated?: boolean;
     created_date?: Date;
     last_modified?: Date;
@@ -33,9 +32,8 @@ interface IClientTable {
 interface IAccountTable {
     id?: string;
     client_id: string;
-    username: string;
-    password: string;
-    api_key: string;
+    account_type: string;
+    access_token: string;
     created_date?: Date;
     last_modified?: Date;
     is_deleted?: boolean;

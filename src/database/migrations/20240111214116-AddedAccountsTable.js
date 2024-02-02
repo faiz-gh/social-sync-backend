@@ -19,9 +19,8 @@ exports.up = function(db) {
     CREATE TABLE IF NOT EXISTS accounts (
       id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
       client_id uuid NOT NULL,
-      username character varying NOT NULL,
-      password character varying NOT NULL,
-      api_key character varying NOT NULL,
+      account_type character varying NOT NULL,
+      access_token character varying NOT NULL,
       created_date timestamp NOT NULL DEFAULT now(),
       last_modified timestamp NOT NULL DEFAULT now(),
       is_deleted boolean NOT NULL DEFAULT false

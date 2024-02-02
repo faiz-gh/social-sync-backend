@@ -26,7 +26,9 @@ exports.up = function(db) {
       is_deleted boolean NOT NULL DEFAULT false
     );
     
-    INSERT INTO roles (role_name, description) VALUES ('admin', 'Admin Account');
+    INSERT INTO roles (role_name, description) VALUES ('ADMIN', 'Admin Account');
+    INSERT INTO roles (role_name, description) VALUES ('COMPANY', 'Company Account');
+    INSERT INTO roles (role_name, description) VALUES ('EMPLOYEE', 'Employee Account');
   `);
 };
 

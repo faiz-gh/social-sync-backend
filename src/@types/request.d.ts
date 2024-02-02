@@ -73,15 +73,14 @@ interface IGetClientsByUserIDRequest extends IPaginationRequest {
 // Account Service
 interface ICreateAccountRequest {
     clientID: string;
-    username: string;
-    password: string;
+    accountType: string;
+    accessToken: string;
 }
 
 interface IUpdateAccountRequest {
     id: string;
-    username: string;
-    password: string;
-    apiKey: string;
+    accountType: string;
+    accessToken: string;
 }
 
 interface IDeleteAccountRequest {
