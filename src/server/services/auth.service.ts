@@ -14,8 +14,61 @@ import {
 import { dbPool } from '@database/config.js';
 import { ApiError } from '@errors/errorHandler.js';
 import { logger } from '@loggers/logger.js';
+import { randomUUID } from 'crypto';
 import { generateHashSecret, getCognitoIdentity } from 'helpers/helpers.js';
 import md5 from 'md5';
+
+/**
+ * @async
+ * @function register
+ * @description Service for POST /auth/mock-register
+ * @param {IRegisterRequest} payload
+ * @returns Promise<Object>
+ */
+export async function mockRegister({ firstName, lastName, email, password, roleId }: IRegisterRequest): Promise<IRegisterResponse> {
+    // generate random uuid
+    const awsUserId = randomUUID();
+
+    const userObj: IUserTable = {
+        first_name: firstName,
+        last_name: lastName,
+        role_id: roleId,
+        email: email,
+        password: md5(password),
+        aws_user_id: awsUserId,
+    }
+
+    const [user] = await dbPool`INSERT INTO users ${dbPool(userObj)} RETURNING *`;
+    logger.silly('User created successfully, Email verification code sent to your email');
+
+    return {
+        message: 'User created successfully, Email verification code sent to your email',
+        data: user,
+    };
+}
+
+/**
+ * @async
+ * @function login
+ * @description Service for POST /auth/mock-login
+ * @param {ILoginRequest} payload
+ * @returns Promise<Object>
+ */
+export async function mockLogin({ email, password }: ILoginRequest): Promise<DefaultServiceResponse> {
+    const [user] = await dbPool`SELECT * FROM users WHERE email = ${email} AND password = ${md5(password)}`;
+
+    if (!user) {
+        logger.error('Invalid email or password');
+        throw new ApiError(401, 'Invalid email or password');
+    }
+
+    logger.silly('User logged in successfully');
+
+    return {
+        message: 'User logged in successfully',
+        data: user
+    };
+}
 
 /**
  * @async

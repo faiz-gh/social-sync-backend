@@ -3,11 +3,13 @@ interface IRegisterRequest {
     firstName: string;
     lastName: string;
     email: string;
+    password: string;
     roleId: number;
 }
 
 interface ILoginRequest {
     email: string;
+    password: string;
 }
 
 interface IVerifyOtpRequest {
