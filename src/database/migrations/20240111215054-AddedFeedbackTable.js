@@ -18,9 +18,9 @@ exports.up = function(db) {
   return db.runSql(`
     CREATE TABLE IF NOT EXISTS feedback (
       id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+      user_id uuid NOT NULL,
       subject character varying NOT NULL,
       description character varying NOT NULL,
-      user_id uuid NOT NULL,
       created_date timestamp NOT NULL DEFAULT now(),
       is_opened boolean NOT NULL DEFAULT false,
       is_deleted boolean NOT NULL DEFAULT false

@@ -10,10 +10,8 @@ interface DefaultServiceErrorResponse {
     error?: string;
 }
 
-interface IPagination {
-    total: number;
-    currentPage: number;
-    totalPages: number;
-    hasMore: boolean;
-    results: T[];
+// Auth Service
+interface IRegisterResponse {
+    message: string;
+    data: IUserTable;
 }

@@ -11,10 +11,10 @@ export async function register(req: Request, res: Response, next: NextFunction) 
     try {
         RequestValidator(req, {
             body: Joi.object({
-                fullName: Joi.string().required(),
+                firstName: Joi.string().required(),
+                lastName: Joi.string().required(),
                 email: Joi.string().email().required(),
-                password: Joi.string().required(),
-                roleID: Joi.required()
+                roleId: Joi.number().required(),
             }),
         });
         const data = await AuthService.register(
@@ -34,12 +34,33 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     try {
         RequestValidator(req, {
             body: Joi.object({
-                email: Joi.string().email().required(),
-                password: Joi.string().required(),
+                email: Joi.string().required(),
             }),
         });
         const data = await AuthService.login(
             req.body as ILoginRequest
+        );
+        res.json(data);
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * @function verifyOtp
+ * @description Controller for POST /auth/verify-otp
+ */
+export async function verifyOtp(req: Request, res: Response, next: NextFunction) {
+    try {
+        RequestValidator(req, {
+            body: Joi.object({
+                email: Joi.string().required(),
+                code: Joi.string().required(),
+                session: Joi.string().required(),
+            }),
+        });
+        const data = await AuthService.verifyOtp(
+            req.body as IVerifyOtpRequest
         );
         res.json(data);
     } catch (error) {
@@ -55,74 +76,12 @@ export async function refreshToken(req: Request, res: Response, next: NextFuncti
     try {
         RequestValidator(req, {
             body: Joi.object({
-                awsUserID: Joi.string().required(),
+                awsUserId: Joi.string().required(),
                 refreshToken: Joi.string().required(),
             }),
         });
         const data = await AuthService.refreshToken(
             req.body as IRefreshTokenRequest
-        );
-        res.json(data);
-    } catch (error) {
-        next(error);
-    }
-}
-
-/**
- * @function forgotPassword
- * @description Controller for POST /auth/forgot-password
- */
-export async function forgotPassword(req: Request, res: Response, next: NextFunction) {
-    try {
-        RequestValidator(req, {
-            body: Joi.object({
-                email: Joi.string().email().required(),
-            }),
-        });
-        const data = await AuthService.forgotPassword(
-            req.body as IForgotPasswordRequest
-        );
-        res.json(data);
-    } catch (error) {
-        next(error);
-    }
-}
-
-/**
- * @function resetPassword
- * @description Controller for POST /auth/reset-password
- */
-export async function resetPassword(req: Request, res: Response, next: NextFunction) {
-    try {
-        RequestValidator(req, {
-            body: Joi.object({
-                email: Joi.string().email().required(),
-                password: Joi.string().required(),
-                code: Joi.string().required(),
-            }),
-        });
-        const data = await AuthService.resetPassword(
-            req.body as IResetPasswordRequest
-        );
-        res.json(data);
-    } catch (error) {
-        next(error);
-    }
-}
-
-/**
- * @function resendCode
- * @description Controller for GET /auth/resend-code
- */
-export async function resendCode(req: Request, res: Response, next: NextFunction) {
-    try {
-        RequestValidator(req, {
-            query: Joi.object({
-                email: Joi.string().email().required(),
-            }),
-        });
-        const data = await AuthService.resendCode(
-            req.query as IResendCodeRequest
         );
         res.json(data);
     } catch (error) {

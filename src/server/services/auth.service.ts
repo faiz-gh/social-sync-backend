@@ -1,11 +1,15 @@
 import {
-    ConfirmForgotPasswordCommand,
-    ForgotPasswordCommand,
     GlobalSignOutCommand,
     InitiateAuthCommand,
     SignUpCommand,
     AdminDeleteUserCommand,
-    ResendConfirmationCodeCommand,
+    RespondToAuthChallengeCommand,
+    RespondToAuthChallengeCommandInput,
+    SignUpCommandInput,
+    InitiateAuthCommandInput,
+    GlobalSignOutCommandInput,
+    AdminDeleteUserCommandInput,
+    SignUpCommandOutput,
 } from '@aws-sdk/client-cognito-identity-provider';
 import { dbPool } from '@database/config.js';
 import { ApiError } from '@errors/errorHandler.js';
@@ -17,37 +21,37 @@ import md5 from 'md5';
  * @async
  * @function register
  * @description Service for POST /auth/register
- * @param {Object} data
+ * @param {IRegisterRequest} payload
  * @returns Promise<Object>
  */
-export async function register({ fullName, email, password, roleID }: IRegisterRequest): Promise<DefaultServiceResponse> {
+export async function register({ firstName, lastName, email, roleId }: IRegisterRequest): Promise<IRegisterResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
-    const userAttr = [];
-    userAttr.push({ Name: 'name', Value: fullName });
+    const password = md5(email);
+
     const hashSecret = generateHashSecret(email);
 
-    const params = {
+    const params: SignUpCommandInput = {
         ClientId: process.env.CLIENT_ID as string,
         Password: password,
         Username: email,
         SecretHash: hashSecret,
-        UserAttributes: userAttr,
     };
 
     try {
-        const result = await cognitoIdentity.send(new SignUpCommand(params));
+        const result: SignUpCommandOutput = await cognitoIdentity.send(new SignUpCommand(params));
 
         const userObj: IUserTable = {
-            full_name: fullName,
-            password: md5(password),
-            role_id: roleID,
+            first_name: firstName,
+            last_name: lastName,
+            role_id: roleId,
             email: email,
             aws_user_id: result.UserSub,
         }
 
         const [user] = await dbPool`INSERT INTO users ${dbPool(userObj)} RETURNING *`;
         logger.silly('User created successfully, Email verification code sent to your email');
+
         return {
             message: 'User created successfully, Email verification code sent to your email',
             data: user,
@@ -72,7 +76,7 @@ export async function register({ fullName, email, password, roleID }: IRegisterR
             throw new ApiError(awsError?.$metadata?.httpStatusCode, 'Too many requests, Please try again later.');
         }
         logger.error('Something went wrong creating new user, Please try again.');
-        throw new ApiError(403, 'Something went wrong creating new user, Please try again.');
+        throw new ApiError(500, 'Something went wrong creating new user, Please try again.');
     }
 }
 
@@ -80,42 +84,37 @@ export async function register({ fullName, email, password, roleID }: IRegisterR
  * @async
  * @function login
  * @description Service for POST /auth/login
- * @param {Object} data
+ * @param {ILoginRequest} payload
  * @returns Promise<Object>
  */
-export async function login({ email, password }: ILoginRequest): Promise<DefaultServiceResponse> {
+export async function login({ email }: ILoginRequest): Promise<DefaultServiceResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
-    const [user] = await dbPool`SELECT * FROM users WHERE email = ${email} AND password = ${md5(password)}`;
+    const [user] = await dbPool`SELECT * FROM users WHERE email = ${email}`;
 
     if (!user) {
-        logger.error('Invalid email or password');
-        throw new ApiError(403, 'Invalid email or password');
+        logger.error('No user exists with this email');
+        throw new ApiError(404, 'No user exists with this email');
     }
 
     const hashSecret = generateHashSecret(email);
 
-    const params = {
-        AuthFlow: 'USER_PASSWORD_AUTH',
+    const params: InitiateAuthCommandInput = {
+        AuthFlow: 'CUSTOM_AUTH',
         ClientId: process.env.CLIENT_ID as string,
         AuthParameters: {
             'USERNAME': email,
-            'PASSWORD': password,
             'SECRET_HASH': hashSecret
         }
     }
 
     try {
-        const result = await cognitoIdentity.send(new InitiateAuthCommand(params as never));
+        const result = await cognitoIdentity.send(new InitiateAuthCommand(params));
         logger.silly('User logged in successfully');
+
         return {
             message: 'User logged in successfully',
-            data: {
-                ...user,
-                accessToken: result.AuthenticationResult?.AccessToken,
-                refreshToken: result.AuthenticationResult?.RefreshToken,
-                idToken: result.AuthenticationResult?.IdToken,
-            },
+            data: result
         };
     } catch (error) {
         const awsError: IAWSCognitoError = error;
@@ -137,142 +136,47 @@ export async function login({ email, password }: ILoginRequest): Promise<Default
             throw new ApiError(awsError?.$metadata?.httpStatusCode, 'Too many requests, Please try again later.');
         }
         logger.error('Something went wrong, Please try again.');
-        throw new ApiError(403, 'Something went wrong, Please try again.');
+        throw new ApiError(500, 'Something went wrong, Please try again.');
     }
 }
 
 /**
  * @async
- * @function refreshToken
- * @description Service for POST /auth/refresh-token
- * @param {string} awsUserID
- * @param {string} refreshToken
+ * @function verifyOtp
+ * @description Service for POST /auth/verify-otp
+ * @param {IVerifyOtpRequest} payload
  * @returns Promise<Object>
  */
-export async function refreshToken({ awsUserID, refreshToken }: IRefreshTokenRequest): Promise<DefaultServiceResponse> {
+export async function verifyOtp({ email, code, session }: IVerifyOtpRequest): Promise<DefaultServiceResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
-    const hashSecret = generateHashSecret(awsUserID);
-    const params = {
-        AuthFlow: 'REFRESH_TOKEN_AUTH',
+    const hashSecret = generateHashSecret(email);
+
+    const params: RespondToAuthChallengeCommandInput = {
         ClientId: process.env.CLIENT_ID as string,
-        AuthParameters: {
-            'REFRESH_TOKEN': refreshToken,
+        ChallengeName: 'CUSTOM_CHALLENGE',
+        ChallengeResponses: {
+            'USERNAME': email,
+            'ANSWER': code,
             'SECRET_HASH': hashSecret
-        }
-    };
+        },
+        Session: session,
+    }
 
     try {
-        const result = await cognitoIdentity.send(new InitiateAuthCommand(params as never));
-        logger.silly('Token refreshed successfully');
+        const result = await cognitoIdentity.send(new RespondToAuthChallengeCommand(params));
+
+        const [user] = await dbPool`SELECT * FROM users WHERE email = ${email}`;
+        logger.silly('User logged in successfully');
 
         return {
-            message: 'Token refreshed successfully',
+            message: 'User logged in successfully',
             data: {
+                ...user,
                 accessToken: result.AuthenticationResult?.AccessToken,
+                refreshToken: result.AuthenticationResult?.RefreshToken,
                 idToken: result.AuthenticationResult?.IdToken,
-            },
-        };
-    } catch (error) {
-        const awsError: IAWSCognitoError = error;
-        console.log(awsError);
-        if (awsError.name === 'NotAuthorizedException') {
-            logger.error('Invalid refresh token. Please log in again.');
-            throw new ApiError(awsError?.$metadata?.httpStatusCode, 'Invalid refresh token. Please log in again.');
-        }
-        if (awsError?.name === 'TooManyRequestsException') {
-            logger.error('Too many requests, Please try again later.');
-            throw new ApiError(awsError?.$metadata?.httpStatusCode, 'Too many requests, Please try again later.');
-        }
-        logger.error('Something went wrong, Please try again.');
-        throw new ApiError(403, 'Something went wrong, Please try again.');
-    }
-}
-
-/**
- * @async
- * @function forgotPassword
- * @description Service for POST /auth/forgot-password
- * @param {string} email
- * @returns Promise<Object>
- */
-export async function forgotPassword({ email }: IForgotPasswordRequest): Promise<DefaultServiceResponse> {
-    const cognitoIdentity = getCognitoIdentity();
-
-    const [userExists] = await dbPool`SELECT * FROM users WHERE email = ${email}`;
-
-    if (!userExists) {
-        logger.error('No user exists with this email');
-        throw new ApiError(403, 'No user exists with this email');
-    }
-
-    const hashSecret = generateHashSecret(email);
-
-    const params = {
-        ClientId: process.env.CLIENT_ID as string,
-        Username: email,
-        SecretHash: hashSecret,
-    }
-
-    try {
-        await cognitoIdentity.send(new ForgotPasswordCommand(params as never));
-        logger.silly('Password reset instructions sent successfully');
-        return {
-            message: 'Password reset instructions sent successfully',
-            data: null,
-        };
-    } catch (error) {
-        const awsError: IAWSCognitoError = error;
-        console.log(awsError);
-        if (awsError?.name === 'UserNotFoundException') {
-            logger.error('User with this email does not exist');
-            throw new ApiError(awsError?.$metadata?.httpStatusCode, 'User with this email does not exist');
-        }
-        if (awsError?.name === 'TooManyRequestsException') {
-            logger.error('Too many requests, Please try again later.');
-            throw new ApiError(awsError?.$metadata?.httpStatusCode, 'Too many requests, Please try again later.');
-        }
-        logger.error('Something went wrong, Please try again.');
-        throw new ApiError(403, 'Something went wrong, Please try again.');
-    }
-}
-
-/**
- * @async
- * @function resetPassword
- * @description Service for POST /auth/reset-password
- * @param {Object} data
- * @returns Promise<Object>
- */
-export async function resetPassword({ email, password, code }: IResetPasswordRequest): Promise<DefaultServiceResponse> {
-    const cognitoIdentity = getCognitoIdentity();
-
-    const [userExists] = await dbPool`SELECT * FROM users WHERE email = ${email}`;
-
-    if (!userExists) {
-        logger.error('No user exists with this email');
-        throw new ApiError(403, 'No user exists with this email');
-    }
-
-    const hashSecret = generateHashSecret(email);
-
-    const params = {
-        ClientId: process.env.CLIENT_ID as string,
-        Username: email,
-        Password: password,
-        ConfirmationCode: code,
-        SecretHash: hashSecret,
-    }
-
-    try {
-        await cognitoIdentity.send(new ConfirmForgotPasswordCommand(params as never));
-
-        const [user] = await dbPool<IUserTable[]>`UPDATE users SET password = ${md5(password)} WHERE email = ${email} RETURNING *`;
-
-        logger.silly('Password reset successful. You can now log in with your new password.');
-        return {
-            message: 'Password reset successful. You can now log in with your new password.',
-            data: user,
+            }
         };
     } catch (error) {
         const awsError: IAWSCognitoError = error;
@@ -298,55 +202,54 @@ export async function resetPassword({ email, password, code }: IResetPasswordReq
             throw new ApiError(awsError?.$metadata?.httpStatusCode, 'User with this email does not exist');
         }
         logger.error('Something went wrong, Please try again.');
-        throw new ApiError(403, 'Something went wrong, Please try again.');
+        throw new ApiError(500, 'Something went wrong, Please try again.');
     }
 }
 
 /**
  * @async
- * @function resendCode
- * @description Service for GET /auth/resend-code
- * @param {string} email
+ * @function refreshToken
+ * @description Service for POST /auth/refresh-token
+ * @param {IRefreshTokenRequest} payload
  * @returns Promise<Object>
  */
-export async function resendCode({ email }: IResendCodeRequest): Promise<DefaultServiceResponse> {
+export async function refreshToken({ awsUserId, refreshToken }: IRefreshTokenRequest): Promise<DefaultServiceResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
-    const [userExists] = await dbPool`SELECT * FROM users WHERE email = ${email}`;
-
-    if (!userExists) {
-        logger.error('No user exists with this email');
-        throw new ApiError(403, 'No user exists with this email');
-    }
-
-    const hashSecret = generateHashSecret(email);
-
-    const params = {
+    const hashSecret = generateHashSecret(awsUserId);
+    const params: InitiateAuthCommandInput = {
+        AuthFlow: 'REFRESH_TOKEN_AUTH',
         ClientId: process.env.CLIENT_ID as string,
-        Username: email,
-        SecretHash: hashSecret,
-    }
+        AuthParameters: {
+            'REFRESH_TOKEN': refreshToken,
+            'SECRET_HASH': hashSecret
+        }
+    };
 
     try {
-        await cognitoIdentity.send(new ResendConfirmationCodeCommand(params as never));
-        logger.silly('Verification code sent successfully');
+        const result = await cognitoIdentity.send(new InitiateAuthCommand(params));
+        logger.silly('Token refreshed successfully');
+
         return {
-            message: 'Verification code sent successfully',
-            data: null,
+            message: 'Token refreshed successfully',
+            data: {
+                accessToken: result.AuthenticationResult?.AccessToken,
+                idToken: result.AuthenticationResult?.IdToken,
+            },
         };
     } catch (error) {
         const awsError: IAWSCognitoError = error;
         console.log(awsError);
-        if (awsError?.name === 'UserNotFoundException') {
-            logger.error('User with this email does not exist');
-            throw new ApiError(awsError?.$metadata?.httpStatusCode, 'User with this email does not exist');
+        if (awsError.name === 'NotAuthorizedException') {
+            logger.error('Invalid refresh token. Please log in again.');
+            throw new ApiError(awsError?.$metadata?.httpStatusCode, 'Invalid refresh token. Please log in again.');
         }
         if (awsError?.name === 'TooManyRequestsException') {
             logger.error('Too many requests, Please try again later.');
             throw new ApiError(awsError?.$metadata?.httpStatusCode, 'Too many requests, Please try again later.');
         }
         logger.error('Something went wrong, Please try again.');
-        throw new ApiError(403, 'Something went wrong, Please try again.');
+        throw new ApiError(500, 'Something went wrong, Please try again.');
     }
 }
 
@@ -354,19 +257,18 @@ export async function resendCode({ email }: IResendCodeRequest): Promise<Default
  * @async
  * @function logout
  * @description Service for POST /auth/logout
- * @param {string} accessToken
+ * @param {ILogoutRequest} payload
  * @returns Promise<Object>
  */
 export async function logout({ accessToken }: ILogoutRequest): Promise<DefaultServiceResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
-    const params = {
-        ClientId: process.env.CLIENT_ID as string,
+    const params: GlobalSignOutCommandInput = {
         AccessToken: accessToken,
     }
 
     try {
-        await cognitoIdentity.send(new GlobalSignOutCommand(params as never));
+        await cognitoIdentity.send(new GlobalSignOutCommand(params));
 
         logger.silly('User logged out successfully');
         return {
@@ -381,7 +283,7 @@ export async function logout({ accessToken }: ILogoutRequest): Promise<DefaultSe
             throw new ApiError(awsError?.$metadata?.httpStatusCode, 'Invalid access token. Please log in.');
         }
         logger.error('Something went wrong, Please try again.');
-        throw new ApiError(403, 'Something went wrong, Please try again.');
+        throw new ApiError(500, 'Something went wrong, Please try again.');
     }
 }
 
@@ -389,8 +291,7 @@ export async function logout({ accessToken }: ILogoutRequest): Promise<DefaultSe
  * @async
  * @function remove
  * @description Service for DELETE /auth
- * @param {string} email
- * @param {string} accessToken
+ * @param {IRemoveUserRequest} payload
  * @returns Promise<Object>
  */
 export async function remove({ email, accessToken }: IRemoveUserRequest): Promise<DefaultServiceResponse> {
@@ -399,13 +300,12 @@ export async function remove({ email, accessToken }: IRemoveUserRequest): Promis
     const [userExists] = await dbPool<IUserTable[]>`SELECT * FROM users WHERE email = ${email}`;
     if (!userExists) {
         logger.error('No user exists with this email');
-        throw new ApiError(403, 'No user exists with this email');
+        throw new ApiError(404, 'No user exists with this email');
     }
 
     await logout({ accessToken });
 
-    const params = {
-        ClientId: process.env.CLIENT_ID as string,
+    const params: AdminDeleteUserCommandInput = {
         UserPoolId: process.env.POOL_ID as string,
         Username: userExists.email,
     }
@@ -423,7 +323,7 @@ export async function remove({ email, accessToken }: IRemoveUserRequest): Promis
             };
         } else {
             logger.error('Something went wrong, Please try again.');
-            throw new ApiError(403, 'Something went wrong, Please try again.');
+            throw new ApiError(500, 'Something went wrong, Please try again.');
         }
     } catch (error) {
         const awsError: IAWSCognitoError = error;
@@ -433,6 +333,6 @@ export async function remove({ email, accessToken }: IRemoveUserRequest): Promis
             throw new ApiError(awsError?.$metadata?.httpStatusCode, 'Invalid access token. Please log in.');
         }
         logger.error('Something went wrong, Please try again.');
-        throw new ApiError(403, 'Something went wrong, Please try again.');
+        throw new ApiError(500, 'Something went wrong, Please try again.');
     }
 }

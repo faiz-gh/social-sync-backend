@@ -7,16 +7,16 @@ import Joi from 'joi';
  * @route POST /account
  * @description Route for creating a new account
  */
-export async function create(req: Request, res: Response, next: NextFunction) {
+export async function createAccount(req: Request, res: Response, next: NextFunction) {
     try {
         RequestValidator(req, {
             body: Joi.object({
-                clientID: Joi.string().required(),
-                username: Joi.string().required(),
-                password: Joi.string().required(),
+                clientId: Joi.string().required(),
+                accountType: Joi.string().required(),
+                accessToken: Joi.string().required(),
             }),
         });
-        const data = await AccountService.create(
+        const data = await AccountService.createAccount(
             req.body as ICreateAccountRequest
         );
         res.json(data);
@@ -29,17 +29,16 @@ export async function create(req: Request, res: Response, next: NextFunction) {
  * @route PUT /account
  * @description Route for updating an existing account
  */
-export async function update(req: Request, res: Response, next: NextFunction) {
+export async function updateAccount(req: Request, res: Response, next: NextFunction) {
     try {
         RequestValidator(req, {
             body: Joi.object({
                 id: Joi.string().required(),
-                username: Joi.string().required(),
-                password: Joi.string().required(),
-                apiKey: Joi.string().required(),
+                accountType: Joi.string().optional(),
+                accessToken: Joi.string().optional(),
             }),
         });
-        const data = await AccountService.update(
+        const data = await AccountService.updateAccount(
             req.body as IUpdateAccountRequest
         );
         res.json(data);
@@ -52,14 +51,14 @@ export async function update(req: Request, res: Response, next: NextFunction) {
  * @route DELETE /account
  * @description Route for deleting an existing account
  */
-export async function remove(req: Request, res: Response, next: NextFunction) {
+export async function removeAccount(req: Request, res: Response, next: NextFunction) {
     try {
         RequestValidator(req, {
             body: Joi.object({
                 id: Joi.string().required(),
             }),
         });
-        const data = await AccountService.remove(
+        const data = await AccountService.removeAccount(
             req.body as IDeleteAccountRequest
         );
         res.json(data);
@@ -69,28 +68,20 @@ export async function remove(req: Request, res: Response, next: NextFunction) {
 }
 
 /**
- * @route GET /account/client/:clientID
+ * @route GET /account/client/:id
  * @description Route for fetching all accounts by client ID
  */
-export async function getByClientId(req: Request, res: Response, next: NextFunction) {
+export async function getAccountByClient(req: Request, res: Response, next: NextFunction) {
     try {
         RequestValidator(req, {
             params: Joi.object({
-                clientID: Joi.string().required(),
-            }),
-            query: Joi.object({
-                search: Joi.string(),
-                page: Joi.number(),
-                perPage: Joi.number(),
-                sortBy: Joi.string().default('created_date'),
-                sortDirection: Joi.string().valid('ASC', 'DESC').default('DESC'),
-            }),
+                id: Joi.string().required(),
+            })
         });
 
-        const payload: IGetAccountsByClientIDRequest = req.query as unknown as IGetAccountsByClientIDRequest;
-        payload.clientID = req.params.clientID;
-
-        const data = await AccountService.getByClientId(payload);
+        const data = await AccountService.getAccountByClient(
+            { clientId: req.params.id } as IGetAccountsByClientRequest
+        );
         res.json(data);
     } catch (error) {
         next(error);
@@ -101,14 +92,16 @@ export async function getByClientId(req: Request, res: Response, next: NextFunct
  * @route GET /account/:id
  * @description Route for fetching an existing account
  */
-export async function getById(req: Request, res: Response, next: NextFunction) {
+export async function getAccount(req: Request, res: Response, next: NextFunction) {
     try {
         RequestValidator(req, {
             params: Joi.object({
                 id: Joi.string().required(),
             }),
         });
-        const data = await AccountService.getById({ id: req.params.id } as IGetAccountByIDRequest);
+        const data = await AccountService.getAccount(
+            { id: req.params.id } as IGetAccountRequest
+        );
         res.json(data);
     } catch (error) {
         next(error);

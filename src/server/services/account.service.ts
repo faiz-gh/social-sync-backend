@@ -2,28 +2,12 @@ import { dbPool } from '@database/config.js';
 import { ApiError } from '@errors/errorHandler.js';
 import { logger } from '@loggers/logger.js';
 
-/*
-interface IAccountTable {
-    id?: string;
-    client_id: string;
-    username: string;
-    password: string;
-    api_key: string;
-    created_date?: Date;
-    last_modified?: Date;
-    is_deleted?: boolean;
-}
-*/
-
-export async function create({ clientID, username, password }: ICreateAccountRequest) {
+export async function createAccount({ clientId, accessToken, accountType }: ICreateAccountRequest) {
     try {
-        const apiKey = '1234567890';
-
         const accountObj: IAccountTable = {
-            client_id: clientID,
-            username: username,
-            password: password,
-            api_key: apiKey
+            client_id: clientId,
+            access_token: accessToken,
+            account_type: accountType,
         }
         const [account] = await dbPool`INSERT INTO accounts ${dbPool(accountObj)} RETURNING *`;
         logger.silly('Account created successfully');
@@ -33,14 +17,19 @@ export async function create({ clientID, username, password }: ICreateAccountReq
             data: account
         }
     } catch (error) {
-        logger.error(`Failed to fetch accounts, please try again\n Error: ${error}`);
-        throw new ApiError(401, 'Failed to fetch accounts, please try again');
+        logger.error(`Failed to create account, please try again\n Error: ${error}`);
+        throw new ApiError(500, 'Failed to create account, please try again');
     }
 }
 
-export async function update({ id, username, password, apiKey }: IUpdateAccountRequest) {
+export async function updateAccount({ id, accessToken, accountType }: IUpdateAccountRequest) {
     try {
-        const [account] = await dbPool`UPDATE accounts SET username = ${username}, password = ${password}, api_key = ${apiKey} WHERE id = ${id} AND is_deleted = false RETURNING *`;
+        const accountObj: IAccountTable = {
+            access_token: accessToken,
+            account_type: accountType,
+        }
+
+        const [account] = await dbPool`UPDATE accounts SET ${dbPool(accountObj)} WHERE id = ${id} AND is_deleted = false RETURNING *`;
         logger.silly('Account updated successfully');
 
         return {
@@ -48,12 +37,12 @@ export async function update({ id, username, password, apiKey }: IUpdateAccountR
             data: account
         }
     } catch (error) {
-        logger.error(`Failed to fetch accounts, please try again\n Error: ${error}`);
-        throw new ApiError(401, 'Failed to fetch accounts, please try again');
+        logger.error(`Failed to update account, please try again\n Error: ${error}`);
+        throw new ApiError(500, 'Failed to fetch account, please try again');
     }
 }
 
-export async function remove({ id }: IDeleteAccountRequest) {
+export async function removeAccount({ id }: IDeleteAccountRequest) {
     try {
         const [account] = await dbPool`UPDATE accounts SET is_deleted = true WHERE id = ${id} RETURNING *`;
         logger.silly('Account removed successfully');
@@ -63,12 +52,12 @@ export async function remove({ id }: IDeleteAccountRequest) {
             data: account
         }
     } catch (error) {
-        logger.error(`Failed to fetch accounts, please try again\n Error: ${error}`);
-        throw new ApiError(401, 'Failed to fetch accounts, please try again');
+        logger.error(`Failed to delete accounts, please try again\n Error: ${error}`);
+        throw new ApiError(500, 'Failed to delete accounts, please try again');
     }
 }
 
-export async function getById({ id }: IGetAccountByIDRequest) {
+export async function getAccount({ id }: IGetAccountRequest) {
     try {
         const [account] = await dbPool`SELECT * FROM accounts WHERE id = ${id} AND is_deleted = false`;
         logger.silly('Account fetched successfully');
@@ -78,47 +67,24 @@ export async function getById({ id }: IGetAccountByIDRequest) {
             data: account
         }
     } catch (error) {
-        logger.error(`Failed to fetch accounts, please try again\n Error: ${error}`);
-        throw new ApiError(401, 'Failed to fetch accounts, please try again');
+        logger.error(`Failed to fetch account, please try again\n Error: ${error}`);
+        throw new ApiError(500, 'Failed to fetch account, please try again');
     }
 }
 
-export async function getByClientId({ clientID, page, perPage, sortBy, sortDirection }: IGetAccountsByClientIDRequest) {
+export async function getAccountByClient({ clientId }: IGetAccountsByClientRequest) {
     try {
-        let _page = Number(page);
-        let _perPage = Number(perPage);
-        if (Number.isNaN(_page)) {
-            _page = 1;
-        }
-        if (Number.isNaN(_perPage)) {
-            _perPage = 20;
-        }
-        const offset = (_page - 1) * _perPage;
 
-        const [totalAccounts] = await dbPool`SELECT COUNT(*) FROM accounts WHERE client_id = ${clientID} AND is_deleted = false`;
-
-        if (Number(totalAccounts.count) === 0) {
-            logger.error('No accounts found');
-            throw new ApiError(404, 'No accounts found');
-        }
-
-        const [accounts] = await dbPool`SELECT * FROM accounts WHERE client_id = ${clientID} AND is_deleted = false ORDER BY ${dbPool(sortBy)} ${dbPool(sortDirection)} LIMIT ${_perPage} OFFSET ${offset}`;
+        const accounts = await dbPool`SELECT * FROM accounts WHERE client_id = ${clientId} AND is_deleted = false`;
 
         logger.silly('Accounts fetched successfully');
 
         return {
             message: 'Accounts fetched successfully',
-            data: {
-                totalItems: Number(totalAccounts.count),
-                totalPages: Math.ceil(Number(totalAccounts.count) / _perPage),
-                page: _page,
-                perPage: _perPage,
-                isLastPage: _perPage * _page >= Number(totalAccounts.count),
-                items: accounts,
-            }
+            data: accounts
         }
     } catch (error) {
         logger.error(`Failed to fetch accounts, please try again\n Error: ${error}`);
-        throw new ApiError(401, 'Failed to fetch accounts, please try again');
+        throw new ApiError(500, 'Failed to fetch accounts, please try again');
     }
 }

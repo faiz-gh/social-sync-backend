@@ -4,7 +4,7 @@
   "description": "This is the backend for SocialSync Web Portal",
   "main": "main.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "dev": "cross-env TSX=true tsx watch src/index.ts",
     "start": "node dist/index.js",
     "test": "cross-env TSX=true tsx watch src/test.n.ts",

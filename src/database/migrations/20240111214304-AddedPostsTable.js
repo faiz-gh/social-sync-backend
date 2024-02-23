@@ -18,10 +18,11 @@ exports.up = function(db) {
   return db.runSql(`
     CREATE TABLE IF NOT EXISTS posts (
       id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
-      media character varying NOT NULL,
+      account_id uuid NOT NULL,
+      media character varying[] NOT NULL,
       location character varying NOT NULL,
       description character varying NOT NULL,
-      account_id uuid NOT NULL,
+      tags character varying[] NOT NULL,
       post_schedule timestamp NOT NULL DEFAULT now(),
       created_date timestamp NOT NULL DEFAULT now(),
       last_modified timestamp NOT NULL DEFAULT now(),

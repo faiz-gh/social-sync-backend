@@ -7,15 +7,17 @@ import Joi from 'joi';
  * @route POST /client
  * @description Route for creating a new client
  */
-export async function create(req: Request, res: Response, next: NextFunction) {
+export async function createClient(req: Request, res: Response, next: NextFunction) {
     try {
         RequestValidator(req, {
             body: Joi.object({
-                userID: Joi.string().required(),
+                companyId: Joi.string().required(),
+                employeeId: Joi.string().required(),
                 name: Joi.string().required(),
+                email: Joi.string().email().required(),
             }),
         });
-        const data = await ClientService.create(
+        const data = await ClientService.createClient(
             req.body as ICreateClientRequest
         );
         res.json(data);
@@ -28,16 +30,18 @@ export async function create(req: Request, res: Response, next: NextFunction) {
  * @route PUT /client
  * @description Route for updating an existing client
  */
-export async function update(req: Request, res: Response, next: NextFunction) {
+export async function updateClient(req: Request, res: Response, next: NextFunction) {
     try {
         RequestValidator(req, {
-            body: Joi.object({
+            query: Joi.object({
                 id: Joi.string().required(),
-                name: Joi.string().required(),
+                employeeId: Joi.string().optional(),
+                name: Joi.string().optional(),
+                email: Joi.string().email().optional(),
             }),
         });
-        const data = await ClientService.update(
-            req.body as IUpdateClientRequest
+        const data = await ClientService.updateClient(
+            req.query as unknown as IUpdateClientRequest
         );
         res.json(data);
     } catch (error) {
@@ -46,49 +50,60 @@ export async function update(req: Request, res: Response, next: NextFunction) {
 }
 
 /**
- * @route DELETE /client
+ * @route DELETE /client/:id
  * @description Route for deleting an existing client
  */
-export async function remove(req: Request, res: Response, next: NextFunction) {
-    try {
-        RequestValidator(req, {
-            body: Joi.object({
-                id: Joi.string().required(),
-            }),
-        });
-        const data = await ClientService.remove(
-            req.body as IDeleteClientRequest
-        );
-        res.json(data);
-    } catch (error) {
-        next(error);
-    }
-}
-
-/**
- * @route GET /user/:userID
- * @description Route for getting all clients
- */
-export async function getByUserId(req: Request, res: Response, next: NextFunction) {
+export async function removeClient(req: Request, res: Response, next: NextFunction) {
     try {
         RequestValidator(req, {
             params: Joi.object({
-                userID: Joi.string().required(),
-            }),
-            query: Joi.object({
-                search: Joi.string(),
-                page: Joi.number(),
-                perPage: Joi.number(),
-                sortBy: Joi.string().default('created_date'),
-                sortDirection: Joi.string().valid('ASC', 'DESC').default('DESC'),
+                id: Joi.string().required(),
             }),
         });
-        const payload: IGetClientsByUserIDRequest = req.query as unknown as IGetClientsByUserIDRequest;
+        const data = await ClientService.removeClient(
+            { id: req.params.id } as IDeleteClientRequest
+        );
+        res.json(data);
+    } catch (error) {
+        next(error);
+    }
+}
 
-        payload.userID = req.params.userID;
+/**
+ * @route GET /client/company/:id
+ * @description Route for getting all clients
+ */
+export async function getClientByCompany(req: Request, res: Response, next: NextFunction) {
+    try {
+        RequestValidator(req, {
+            params: Joi.object({
+                id: Joi.string().required(),
+            }),
+        });
 
-        const data = await ClientService.getByUserId(
-            payload
+        const data = await ClientService.getClientByCompany(
+            { companyId: req.params.id } as IGetClientsByCompanyRequest
+        );
+        res.json(data);
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * @route GET /client/employee/:id
+ * @description Route for getting all clients
+ */
+export async function getClientByEmployee(req: Request, res: Response, next: NextFunction) {
+    try {
+        RequestValidator(req, {
+            params: Joi.object({
+                id: Joi.string().required(),
+            }),
+        });
+
+        const data = await ClientService.getClientByEmployee(
+            { employeeId: req.params.id } as IGetClientsByEmployeeRequest
         );
         res.json(data);
     } catch (error) {
@@ -100,15 +115,15 @@ export async function getByUserId(req: Request, res: Response, next: NextFunctio
  * @route GET /client/:id
  * @description Route for getting an existing client
  */
-export async function getById(req: Request, res: Response, next: NextFunction) {
+export async function getClient(req: Request, res: Response, next: NextFunction) {
     try {
         RequestValidator(req, {
             params: Joi.object({
                 id: Joi.string().required(),
             }),
         });
-        const data = await ClientService.getById(
-            { id: req.params.id } as IGetClientByIDRequest
+        const data = await ClientService.getClient(
+            { id: req.params.id } as IGetClientRequest
         );
         res.json(data);
     } catch (error) {

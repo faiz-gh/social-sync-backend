@@ -20,10 +20,9 @@ exports.up = function(db) {
       id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
       role_id integer NOT NULL,
       aws_user_id uuid NOT NULL,
-      full_name character varying NOT NULL,
-      email character varying NOT NULL,
-      password character varying NOT NULL,
-      is_activated boolean NOT NULL DEFAULT true,
+      first_name character varying NOT NULL,
+      last_name character varying NOT NULL,
+      email character varying UNIQUE NOT NULL,
       created_date timestamp NOT NULL DEFAULT now(),
       last_modified timestamp NOT NULL DEFAULT now(),
       is_deleted boolean NOT NULL DEFAULT false

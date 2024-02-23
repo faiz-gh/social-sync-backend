@@ -1,7 +1,7 @@
 interface IRoleTable {
-    id?: string;
-    role_name: string;
-    description: string;
+    id?: number;
+    role_name?: string;
+    description?: string;
     created_date?: Date;
     last_modified?: Date;
     is_deleted?: boolean;
@@ -9,21 +9,28 @@ interface IRoleTable {
 
 interface IUserTable {
     id?: string;
-    role_id: string;
-    aws_user_id: string;
-    full_name: string;
-    email: string;
-    password: string;
-    is_activated?: boolean;
+    role_id?: number;
+    aws_user_id?: string;
+    first_name?: string;
+    last_name?: string;
+    email?: string;
     created_date?: Date;
     last_modified?: Date;
     is_deleted?: boolean;
 }
 
+interface ICompanyEmployeeConnectionTable {
+    id?: number;
+    company_id?: string;
+    employee_id?: string;
+}
+
 interface IClientTable {
     id?: string;
-    user_id: string;
-    name: string;
+    company_id?: string;
+    employee_id?: string;
+    name?: string;
+    email?: string;
     created_date?: Date;
     last_modified?: Date;
     is_deleted?: boolean;
@@ -31,9 +38,9 @@ interface IClientTable {
 
 interface IAccountTable {
     id?: string;
-    client_id: string;
-    account_type: string;
-    access_token: string;
+    client_id?: string;
+    account_type?: string;
+    access_token?: string;
     created_date?: Date;
     last_modified?: Date;
     is_deleted?: boolean;
@@ -41,79 +48,36 @@ interface IAccountTable {
 
 interface IPostTable {
     id?: string;
-    media: string;
-    location: string;
-    description: string;
-    account_id: string;
-    post_schedule: Date;
+    account_id?: string;
+    media?: string[];
+    location?: string;
+    description?: string;
+    tags?: string[];
+    post_schedule?: Date;
     created_date?: Date;
     last_modified?: Date;
-    is_deleted?: boolean;
-}
-
-interface IAnalyticsTable {
-    id?: string;
-    post_id: string;
-    data: string;
-    created_date?: Date;
-}
-
-interface IChannelTable {
-    id?: string;
-    subject: string;
-    user_id: string;
-    members: string;
-    created_date?: Date;
-    last_modified?: Date;
-    is_deleted?: boolean;
-}
-
-interface IChatTable {
-    id?: string;
-    message: string;
-    user_id: string;
-    created_date?: Date;
-    is_deleted?: boolean;
-}
-
-interface ITaskTable {
-    id: string;
-    title: string;
-    description: string;
-    user_id: string;
-    created_date?: Date;
-    last_modified?: Date;
-    estimated_time?: Date;
-    time_taken?: Date;
-    is_completed?: boolean;
     is_deleted?: boolean;
 }
 
 interface IEventTable {
-    id: string;
-    title: string;
-    reminder?: Date;
-    scheduled_at?: Date;
-    user_id: string;
+    id?: string;
+    company_id?: string;
+    title?: string;
+    description?: string;
+    location?: string;
+    start_date?: Date;
+    end_date?: Date;
     created_date?: Date;
     last_modified?: Date;
     is_deleted?: boolean;
 }
 
 interface IFeedbackTable {
-    id: string;
-    subject: string;
-    description: string;
-    user_id: string;
+    id?: string;
+    user_id?: string;
+    subject?: string;
+    description?: string;
     created_date?: Date;
     is_opened?: boolean;
     is_deleted?: boolean;
-}
-
-interface IPreferenceTable {
-    id: string;
-    user_id: string;
-    theme: string;
-    layout: string;
-    last_modified?: Date;
 }
