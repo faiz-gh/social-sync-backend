@@ -112,11 +112,11 @@ interface IGetAccountsByClientRequest {
 // Post Service
 interface ICreatePostRequest {
     accountId: string;
-    media: string[];
-    location: string;
+    media?: string[];
+    location?: string;
     description: string;
-    tags: string[];
-    postSchedule: Date;
+    tags?: string[];
+    postSchedule?: Date;
 }
 
 interface IUpdatePostRequest {

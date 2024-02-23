@@ -25,3 +25,5 @@ interface IGenerateTemplate {
 interface IMiddlewareAuthJWT {
     sub?: string;
 }
+
+declare module 'social-post-api';
