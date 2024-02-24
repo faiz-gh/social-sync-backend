@@ -14,11 +14,10 @@ export async function register(req: Request, res: Response, next: NextFunction) 
                 firstName: Joi.string().required(),
                 lastName: Joi.string().required(),
                 email: Joi.string().email().required(),
-                password: Joi.string().required(),
                 roleId: Joi.number().required(),
             }),
         });
-        const data = await AuthService.mockRegister(
+        const data = await AuthService.register(
             req.body as IRegisterRequest
         );
         res.json(data);
@@ -36,10 +35,9 @@ export async function login(req: Request, res: Response, next: NextFunction) {
         RequestValidator(req, {
             body: Joi.object({
                 email: Joi.string().required(),
-                password: Joi.string().required(),
             }),
         });
-        const data = await AuthService.mockLogin(
+        const data = await AuthService.login(
             req.body as ILoginRequest
         );
         res.json(data);

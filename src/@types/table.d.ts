@@ -14,7 +14,6 @@ interface IUserTable {
     first_name?: string;
     last_name?: string;
     email?: string;
-    password?: string;
     created_date?: Date;
     last_modified?: Date;
     is_deleted?: boolean;
