@@ -16,7 +16,7 @@ export async function createPost(req: Request, res: Response, next: NextFunction
                 location: Joi.string().optional(),
                 description: Joi.string().required(),
                 tags: Joi.array().items(Joi.string()).optional(),
-                postSchedule: Joi.date().required(),
+                postSchedule: Joi.date().optional(),
             }),
         });
         const data = await PostService.createPost(

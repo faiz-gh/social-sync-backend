@@ -17,9 +17,9 @@ exports.setup = function(options, seedLink) {
 exports.up = function(db) {
   return db.runSql(`
     CREATE TABLE company_employee_connection (
-      id INT AUTO_INCREMENT PRIMARY KEY,
-      company_id INT NOT NULL,
-      employee_id INT NOT NULL
+      id serial PRIMARY KEY,
+      company_id uuid NOT NULL,
+      employee_id uuid NOT NULL
     );
     ALTER TABLE company_employee_connection ADD CONSTRAINT user_company_connection_fk FOREIGN KEY (company_id) REFERENCES users (id);
     ALTER TABLE company_employee_connection ADD CONSTRAINT user_employee_connection_fk FOREIGN KEY (employee_id) REFERENCES users (id);

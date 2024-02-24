@@ -5,15 +5,12 @@ import SocialPost from 'social-post-api';
 
 export async function createPost({ accountId, description, location, media, postSchedule, tags }: ICreatePostRequest): Promise<DefaultServiceResponse> {
     try {
-
         const social = new SocialPost(process.env.AYRSHARE_API_KEY);
 
         const createdPost = await social.post({
             post: description,
             platforms: ["facebook"],
             mediaUrls: media[0],
-            scheduleDate: postSchedule,
-            autoTags: true
         }).catch(() => {
             logger.error(`Failed to create post, please try again`);
             throw new ApiError(500, 'Failed to create post, please try again');
@@ -23,18 +20,17 @@ export async function createPost({ accountId, description, location, media, post
         const postObj: IPostTable = {
             account_id: accountId,
             description: description,
-            location: location,
+            location: location ?? "default location",
             media: media,
-            post_schedule: postSchedule,
-            tags: tags
+            post_schedule: postSchedule ?? new Date(),
+            tags: tags ?? []
         }
 
         const [post] = await dbPool<IPostTable[]>`INSERT INTO posts ${dbPool(postObj)} RETURNING *`;
         logger.silly('Post created successfully');
 
-        logger.silly('This is silly');
         return {
-            message: 'This is a test',
+            message: 'Post Created Successfully',
             data: {
                 post: post,
                 postResponse: createdPost
