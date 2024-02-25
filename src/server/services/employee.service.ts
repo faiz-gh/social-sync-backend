@@ -58,11 +58,13 @@ export async function getEmployeesByCompany({ companyId }: IGetEmployeesByCompan
     try {
         const employees = await dbPool<IUserTable[]>`
             SELECT
-                *
+                usr.*,
+                COUNT(clt.*) AS total_clients
             FROM
-                users
+                users usr
+                LEFT JOIN clients clt ON usr.id = clt.employee_id AND clt.is_deleted = false
             WHERE
-                id IN (
+                usr.id IN (
                     SELECT
                         employee_id
                     FROM
@@ -70,8 +72,10 @@ export async function getEmployeesByCompany({ companyId }: IGetEmployeesByCompan
                     WHERE
                         company_id = ${companyId}
                 ) 
-                AND role_id = 3
-                AND is_deleted = false
+                AND usr.role_id = 3
+                AND usr.is_deleted = false
+            GROUP BY
+                usr.id
             `;
         logger.silly('Employees fetched successfully');
 
@@ -91,9 +95,15 @@ export async function getEmployee({ id }: IGetEmployeeRequest): Promise<DefaultS
         const [employee] = await dbPool<IUserTable[]>`SELECT * FROM users WHERE id = ${id} AND role_id = 3 AND is_deleted = false`;
         logger.silly('Employee fetched successfully');
 
+        const [totalClients] = await dbPool`SELECT COUNT(*) FROM clients WHERE employee_id = ${employee.id} AND is_deleted = false`;
+        logger.silly('Total clients fetched successfully');
+
         return {
             message: 'Employee fetched successfully',
-            data: employee
+            data: {
+                ...employee,
+                total_clients: totalClients.count
+            }
         }
     } catch (error) {
         console.log(error);

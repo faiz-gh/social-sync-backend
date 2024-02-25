@@ -62,9 +62,15 @@ export async function getAccount({ id }: IGetAccountRequest) {
         const [account] = await dbPool`SELECT * FROM accounts WHERE id = ${id} AND is_deleted = false`;
         logger.silly('Account fetched successfully');
 
+        const [totalPosts] = await dbPool`SELECT COUNT(*) FROM posts WHERE account_id = ${account.id} AND is_deleted = false`;
+        logger.silly('Total posts fetched successfully');
+
         return {
             message: 'Account fetched successfully',
-            data: account
+            data: {
+                ...account,
+                total_posts: totalPosts.count
+            }
         }
     } catch (error) {
         logger.error(`Failed to fetch account, please try again\n Error: ${error}`);
@@ -75,8 +81,19 @@ export async function getAccount({ id }: IGetAccountRequest) {
 export async function getAccountByClient({ clientId }: IGetAccountsByClientRequest) {
     try {
 
-        const accounts = await dbPool`SELECT * FROM accounts WHERE client_id = ${clientId} AND is_deleted = false`;
-
+        const accounts = await dbPool`
+            SELECT
+                acc.*,
+                COUNT(pst.*) as total_posts
+            FROM
+                accounts acc
+                LEFT JOIN posts pst ON acc.id = pst.account_id AND pst.is_deleted = false
+            WHERE
+                acc.client_id = ${clientId} 
+                AND acc.is_deleted = false
+            GROUP BY
+                acc.id
+        `;
         logger.silly('Accounts fetched successfully');
 
         return {

@@ -60,8 +60,19 @@ export async function removeClient({ id }: IDeleteClientRequest): Promise<Defaul
 
 export async function getClientByCompany({ companyId }: IGetClientsByCompanyRequest): Promise<DefaultServiceResponse> {
     try {
-        const [clients] = await dbPool<IClientTable[]>`SELECT * FROM clients WHERE company_id = ${companyId} AND is_deleted = false`;
-
+        const [clients] = await dbPool<IClientTable[]>`
+            SELECT 
+                clt.*,
+                COUNT(acc.*) as total_accounts
+            FROM
+                clients clt
+                LEFT JOIN accounts acc ON clt.id = acc.client_id AND acc.is_deleted = false
+            WHERE
+                clt.company_id = ${companyId} 
+                AND clt.is_deleted = false
+            GROUP BY 
+                clt.id
+        `;
         logger.silly('Clients fetched successfully');
 
         return {
@@ -76,8 +87,19 @@ export async function getClientByCompany({ companyId }: IGetClientsByCompanyRequ
 
 export async function getClientByEmployee({ employeeId }: IGetClientsByEmployeeRequest): Promise<DefaultServiceResponse> {
     try {
-        const [clients] = await dbPool<IClientTable[]>`SELECT * FROM clients WHERE employee_id = ${employeeId} AND is_deleted = false`;
-
+        const [clients] = await dbPool<IClientTable[]>`
+            SELECT
+                clt.*,
+                COUNT(acc.*) as total_accounts
+            FROM
+                clients clt
+                LEFT JOIN accounts acc ON clt.id = acc.client_id AND acc.is_deleted = false
+            WHERE
+                clt.employee_id = ${employeeId} 
+                AND clt.is_deleted = false
+            GROUP BY 
+                clt.id
+        `;
         logger.silly('Clients fetched successfully');
 
         return {
@@ -95,9 +117,15 @@ export async function getClient({ id }: IGetClientRequest): Promise<DefaultServi
         const [client] = await dbPool<IClientTable[]>`SELECT * FROM clients WHERE id = ${id} AND is_deleted = false`;
         logger.silly('Client fetched successfully');
 
+        const [totalAccounts] = await dbPool`SELECT COUNT(*) FROM accounts WHERE client_id = ${client.id} AND is_deleted = false`
+        logger.silly('Total accounts fetched successfully');
+
         return {
             message: 'Client fetched successfully',
-            data: client
+            data: {
+                ...client,
+                total_accounts: totalAccounts.count
+            }
         }
     } catch (error) {
         logger.error(`Failed to fetch clients, please try again\n Error: ${error}`);
