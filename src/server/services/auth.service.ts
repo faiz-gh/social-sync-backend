@@ -87,7 +87,7 @@ export async function register({ firstName, lastName, email, roleId }: IRegister
  * @param {ILoginRequest} payload
  * @returns Promise<Object>
  */
-export async function login({ email }: ILoginRequest): Promise<DefaultServiceResponse> {
+export async function login({ email }: ILoginRequest): Promise<ILoginResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
     const [user] = await dbPool`SELECT * FROM users WHERE email = ${email}`;
@@ -147,7 +147,7 @@ export async function login({ email }: ILoginRequest): Promise<DefaultServiceRes
  * @param {IVerifyOtpRequest} payload
  * @returns Promise<Object>
  */
-export async function verifyOtp({ email, code, session }: IVerifyOtpRequest): Promise<DefaultServiceResponse> {
+export async function verifyOtp({ email, code, session }: IVerifyOtpRequest): Promise<IVerifyOtpResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
     const hashSecret = generateHashSecret(email);
@@ -213,7 +213,7 @@ export async function verifyOtp({ email, code, session }: IVerifyOtpRequest): Pr
  * @param {IRefreshTokenRequest} payload
  * @returns Promise<Object>
  */
-export async function refreshToken({ awsUserId, refreshToken }: IRefreshTokenRequest): Promise<DefaultServiceResponse> {
+export async function refreshToken({ awsUserId, refreshToken }: IRefreshTokenRequest): Promise<IRefreshTokenResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
     const hashSecret = generateHashSecret(awsUserId);
@@ -260,7 +260,7 @@ export async function refreshToken({ awsUserId, refreshToken }: IRefreshTokenReq
  * @param {ILogoutRequest} payload
  * @returns Promise<Object>
  */
-export async function logout({ accessToken }: ILogoutRequest): Promise<DefaultServiceResponse> {
+export async function logout({ accessToken }: ILogoutRequest): Promise<ILogoutResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
     const params: GlobalSignOutCommandInput = {
@@ -294,7 +294,7 @@ export async function logout({ accessToken }: ILogoutRequest): Promise<DefaultSe
  * @param {IRemoveUserRequest} payload
  * @returns Promise<Object>
  */
-export async function remove({ email, accessToken }: IRemoveUserRequest): Promise<DefaultServiceResponse> {
+export async function remove({ email, accessToken }: IRemoveUserRequest): Promise<IRemoveUserResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
     const [userExists] = await dbPool<IUserTable[]>`SELECT * FROM users WHERE email = ${email}`;

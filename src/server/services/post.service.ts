@@ -3,7 +3,7 @@ import { ApiError } from '@errors/errorHandler.js';
 import { logger } from '@loggers/logger.js';
 import SocialPost from 'social-post-api';
 
-export async function createPost({ accountId, description, location, media, postSchedule, tags }: ICreatePostRequest): Promise<DefaultServiceResponse> {
+export async function createPost({ accountId, description, location, media, postSchedule, tags }: ICreatePostRequest): Promise<ICreatePostResponse> {
     try {
         const social = new SocialPost(process.env.AYRSHARE_API_KEY);
 
@@ -42,7 +42,7 @@ export async function createPost({ accountId, description, location, media, post
     }
 }
 
-export async function getPost({ id }: IGetPostRequest): Promise<DefaultServiceResponse> {
+export async function getPost({ id }: IGetPostRequest): Promise<IGetPostResponse> {
     try {
         const [post] = await dbPool<IPostTable[]>`SELECT * FROM posts WHERE id = ${id} AND is_deleted = false`;
         logger.silly('Post retrieved successfully');
@@ -57,10 +57,10 @@ export async function getPost({ id }: IGetPostRequest): Promise<DefaultServiceRe
     }
 }
 
-export async function getPostsByAccount({ accountId }: IGetPostsByAccountRequest): Promise<DefaultServiceResponse> {
+export async function getPostsByAccount({ accountId }: IGetPostsByAccountRequest): Promise<IGetPostsByAccountResponse> {
     try {
         const posts = await dbPool<IPostTable[]>`SELECT * FROM posts WHERE account_id = ${accountId} AND is_deleted = false`;
-        logger.silly('Posts retrieved successfully');
+        logger.silly('Posts retrieveduser.data successfully');
 
         return {
             message: 'Posts retrieved successfully',
@@ -72,7 +72,7 @@ export async function getPostsByAccount({ accountId }: IGetPostsByAccountRequest
     }
 }
 
-export async function getPostsByClient({ clientId }: IGetPostsByClientRequest): Promise<DefaultServiceResponse> {
+export async function getPostsByClient({ clientId }: IGetPostsByClientRequest): Promise<IGetPostsByClientResponse> {
     try {
         const posts = await dbPool<IPostTable[]>`SELECT 
                 *

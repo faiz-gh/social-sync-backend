@@ -17,6 +17,8 @@ interface IUserTable {
     created_date?: Date;
     last_modified?: Date;
     is_deleted?: boolean;
+    total_clients?: number;
+    company_id?: string;
 }
 
 interface ICompanyEmployeeConnectionTable {
@@ -34,6 +36,7 @@ interface IClientTable {
     created_date?: Date;
     last_modified?: Date;
     is_deleted?: boolean;
+    total_accounts?: number;
 }
 
 interface IAccountTable {
@@ -44,6 +47,7 @@ interface IAccountTable {
     created_date?: Date;
     last_modified?: Date;
     is_deleted?: boolean;
+    total_posts?: number;
 }
 
 interface IPostTable {

@@ -2,7 +2,7 @@ import { dbPool } from '@database/config.js';
 import { ApiError } from '@errors/errorHandler.js';
 import { logger } from '@loggers/logger.js';
 
-export async function createClient({ companyId, employeeId, name, email }: ICreateClientRequest): Promise<DefaultServiceResponse> {
+export async function createClient({ companyId, employeeId, name, email }: ICreateClientRequest): Promise<ICreateClientResponse> {
     try {
         const clientObj: IClientTable = {
             company_id: companyId,
@@ -23,7 +23,7 @@ export async function createClient({ companyId, employeeId, name, email }: ICrea
     }
 }
 
-export async function updateClient({ id, employeeId, name, email }: IUpdateClientRequest): Promise<DefaultServiceResponse> {
+export async function updateClient({ id, employeeId, name, email }: IUpdateClientRequest): Promise<IUpdateClientResponse> {
     try {
         const clientObj: IClientTable = {
             employee_id: employeeId,
@@ -43,7 +43,7 @@ export async function updateClient({ id, employeeId, name, email }: IUpdateClien
     }
 }
 
-export async function removeClient({ id }: IDeleteClientRequest): Promise<DefaultServiceResponse> {
+export async function removeClient({ id }: IDeleteClientRequest): Promise<IRemoveClientResponse> {
     try {
         const [client] = await dbPool<IClientTable[]>`UPDATE clients SET is_deleted = true WHERE id = ${id} RETURNING *`;
         logger.silly('Client removed successfully');
@@ -58,9 +58,9 @@ export async function removeClient({ id }: IDeleteClientRequest): Promise<Defaul
     }
 }
 
-export async function getClientByCompany({ companyId }: IGetClientsByCompanyRequest): Promise<DefaultServiceResponse> {
+export async function getClientByCompany({ companyId }: IGetClientsByCompanyRequest): Promise<IGetClientsByCompanyResponse> {
     try {
-        const [clients] = await dbPool<IClientTable[]>`
+        const clients = await dbPool<IClientTable[]>`
             SELECT 
                 clt.*,
                 COUNT(acc.*) as total_accounts
@@ -85,9 +85,9 @@ export async function getClientByCompany({ companyId }: IGetClientsByCompanyRequ
     }
 }
 
-export async function getClientByEmployee({ employeeId }: IGetClientsByEmployeeRequest): Promise<DefaultServiceResponse> {
+export async function getClientByEmployee({ employeeId }: IGetClientsByEmployeeRequest): Promise<IGetClientsByEmployeeResponse> {
     try {
-        const [clients] = await dbPool<IClientTable[]>`
+        const clients = await dbPool<IClientTable[]>`
             SELECT
                 clt.*,
                 COUNT(acc.*) as total_accounts
@@ -112,7 +112,7 @@ export async function getClientByEmployee({ employeeId }: IGetClientsByEmployeeR
     }
 }
 
-export async function getClient({ id }: IGetClientRequest): Promise<DefaultServiceResponse> {
+export async function getClient({ id }: IGetClientRequest): Promise<IGetClientResponse> {
     try {
         const [client] = await dbPool<IClientTable[]>`SELECT * FROM clients WHERE id = ${id} AND is_deleted = false`;
         logger.silly('Client fetched successfully');

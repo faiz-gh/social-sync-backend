@@ -2,7 +2,7 @@ import { dbPool } from '@database/config.js';
 import { ApiError } from '@errors/errorHandler.js';
 import { logger } from '@loggers/logger.js';
 
-export async function createEvent({ companyId, title, description, location, startDate, endDate }: ICreateEventRequest): Promise<DefaultServiceResponse> {
+export async function createEvent({ companyId, title, description, location, startDate, endDate }: ICreateEventRequest): Promise<ICreateEventResponse> {
     try {
         const eventObj: IEventTable = {
             company_id: companyId,
@@ -25,7 +25,7 @@ export async function createEvent({ companyId, title, description, location, sta
     }
 }
 
-export async function updateEvent({ id, title, description, location, startDate, endDate }: IUpdateEventRequest): Promise<DefaultServiceResponse> {
+export async function updateEvent({ id, title, description, location, startDate, endDate }: IUpdateEventRequest): Promise<IUpdateEventResponse> {
     try {
         const eventObj: IEventTable = {
             title: title,
@@ -48,7 +48,7 @@ export async function updateEvent({ id, title, description, location, startDate,
     }
 }
 
-export async function deleteEvent({ id }: IDeleteEventRequest): Promise<DefaultServiceResponse> {
+export async function deleteEvent({ id }: IDeleteEventRequest): Promise<IDeleteEventResponse> {
     try {
         const [event] = await dbPool<IEventTable[]>`UPDATE events SET is_deleted = true WHERE id = ${id} RETURNING *`;
         logger.silly('Event deleted successfully');
@@ -63,7 +63,7 @@ export async function deleteEvent({ id }: IDeleteEventRequest): Promise<DefaultS
     }
 }
 
-export async function getEvent({ id }: IGetEventRequest): Promise<DefaultServiceResponse> {
+export async function getEvent({ id }: IGetEventRequest): Promise<IGetEventResponse> {
     try {
         const [event] = await dbPool<IEventTable[]>`SELECT * FROM events WHERE id = ${id} AND is_deleted = false`;
         logger.silly('Event retrieved successfully');
@@ -78,7 +78,7 @@ export async function getEvent({ id }: IGetEventRequest): Promise<DefaultService
     }
 }
 
-export async function getEventsByCompany({ companyId }: IGetEventsByCompanyRequest): Promise<DefaultServiceResponse> {
+export async function getEventsByCompany({ companyId }: IGetEventsByCompanyRequest): Promise<IGetEventsByCompanyResponse> {
     try {
         const events = await dbPool<IEventTable[]>`SELECT * FROM events WHERE company_id = ${companyId} AND is_deleted = false`;
         logger.silly('Events retrieved successfully');

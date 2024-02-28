@@ -3,7 +3,7 @@ import { ApiError } from '@errors/errorHandler.js';
 import { logger } from '@loggers/logger.js';
 import * as AuthService from '@services/auth.service.js';
 
-export async function createEmployee({ companyId, firstName, lastName, email }: ICreateEmployeeRequest): Promise<DefaultServiceResponse> {
+export async function createEmployee({ companyId, firstName, lastName, email }: ICreateEmployeeRequest): Promise<ICreateEmployeeResponse> {
     try {
         const registerRequest: IRegisterRequest = {
             firstName,
@@ -12,6 +12,10 @@ export async function createEmployee({ companyId, firstName, lastName, email }: 
             roleId: 3
         }
         const user: IRegisterResponse = await AuthService.register(registerRequest);
+
+        if (user.data) {
+            user.data.company_id = companyId;
+        }
 
         const companyEmployeeObj: ICompanyEmployeeConnectionTable = {
             company_id: companyId,
@@ -32,7 +36,7 @@ export async function createEmployee({ companyId, firstName, lastName, email }: 
     }
 }
 
-export async function updateEmployee({ id, firstName, lastName, roleId }: IUpdateEmployeeRequest): Promise<DefaultServiceResponse> {
+export async function updateEmployee({ id, firstName, lastName, roleId }: IUpdateEmployeeRequest): Promise<IUpdateEmployeeResponse> {
     try {
         const userObj: IUserTable = {
             first_name: firstName,
@@ -43,9 +47,14 @@ export async function updateEmployee({ id, firstName, lastName, roleId }: IUpdat
         const [employee] = await dbPool<IUserTable[]>`UPDATE users SET ${dbPool(userObj)} WHERE id = ${id} AND role_id = 3 AND is_deleted = false RETURNING *`;
         logger.silly('Employee updated successfully');
 
+        const [companyEmployeeConnection] = await dbPool<ICompanyEmployeeConnectionTable[]>`SELECT * FROM company_employee_connection WHERE employee_id = ${employee.id}`;
+
         return {
             message: 'Employee updated successfully',
-            data: employee
+            data: {
+                ...employee,
+                company_id: companyEmployeeConnection.company_id
+            }
         }
     } catch (error) {
         console.log(error);
@@ -54,7 +63,7 @@ export async function updateEmployee({ id, firstName, lastName, roleId }: IUpdat
     }
 }
 
-export async function getEmployeesByCompany({ companyId }: IGetEmployeesByCompanyRequest): Promise<DefaultServiceResponse> {
+export async function getEmployeesByCompany({ companyId }: IGetEmployeesByCompanyRequest): Promise<IGetEmployeesByCompanyResponse> {
     try {
         const employees = await dbPool<IUserTable[]>`
             SELECT
@@ -90,7 +99,7 @@ export async function getEmployeesByCompany({ companyId }: IGetEmployeesByCompan
     }
 }
 
-export async function getEmployee({ id }: IGetEmployeeRequest): Promise<DefaultServiceResponse> {
+export async function getEmployee({ id }: IGetEmployeeRequest): Promise<IGetEmployeeResponse> {
     try {
         const [employee] = await dbPool<IUserTable[]>`SELECT * FROM users WHERE id = ${id} AND role_id = 3 AND is_deleted = false`;
         logger.silly('Employee fetched successfully');
@@ -98,11 +107,14 @@ export async function getEmployee({ id }: IGetEmployeeRequest): Promise<DefaultS
         const [totalClients] = await dbPool`SELECT COUNT(*) FROM clients WHERE employee_id = ${employee.id} AND is_deleted = false`;
         logger.silly('Total clients fetched successfully');
 
+        const [companyEmployeeConnection] = await dbPool<ICompanyEmployeeConnectionTable[]>`SELECT * FROM company_employee_connection WHERE employee_id = ${employee.id}`;
+
         return {
             message: 'Employee fetched successfully',
             data: {
                 ...employee,
-                total_clients: totalClients.count
+                total_clients: totalClients.count,
+                company_id: companyEmployeeConnection.company_id
             }
         }
     } catch (error) {

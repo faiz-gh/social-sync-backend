@@ -2,7 +2,7 @@ import { dbPool } from '@database/config.js';
 import { ApiError } from '@errors/errorHandler.js';
 import { logger } from '@loggers/logger.js';
 
-export async function createAccount({ clientId, accessToken, accountType }: ICreateAccountRequest) {
+export async function createAccount({ clientId, accessToken, accountType }: ICreateAccountRequest): Promise<ICreateAccountResponse> {
     try {
         const accountObj: IAccountTable = {
             client_id: clientId,
@@ -22,7 +22,7 @@ export async function createAccount({ clientId, accessToken, accountType }: ICre
     }
 }
 
-export async function updateAccount({ id, accessToken, accountType }: IUpdateAccountRequest) {
+export async function updateAccount({ id, accessToken, accountType }: IUpdateAccountRequest): Promise<IUpdateAccountResponse> {
     try {
         const accountObj: IAccountTable = {
             access_token: accessToken,
@@ -42,7 +42,7 @@ export async function updateAccount({ id, accessToken, accountType }: IUpdateAcc
     }
 }
 
-export async function removeAccount({ id }: IDeleteAccountRequest) {
+export async function removeAccount({ id }: IDeleteAccountRequest): Promise<IRemoveAccountResponse> {
     try {
         const [account] = await dbPool`UPDATE accounts SET is_deleted = true WHERE id = ${id} RETURNING *`;
         logger.silly('Account removed successfully');
@@ -57,7 +57,7 @@ export async function removeAccount({ id }: IDeleteAccountRequest) {
     }
 }
 
-export async function getAccount({ id }: IGetAccountRequest) {
+export async function getAccount({ id }: IGetAccountRequest): Promise<IGetAccountResponse> {
     try {
         const [account] = await dbPool`SELECT * FROM accounts WHERE id = ${id} AND is_deleted = false`;
         logger.silly('Account fetched successfully');
@@ -78,7 +78,7 @@ export async function getAccount({ id }: IGetAccountRequest) {
     }
 }
 
-export async function getAccountByClient({ clientId }: IGetAccountsByClientRequest) {
+export async function getAccountByClient({ clientId }: IGetAccountsByClientRequest): Promise<IGetAccountsByClientResponse> {
     try {
 
         const accounts = await dbPool`
