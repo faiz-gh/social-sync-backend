@@ -15,7 +15,6 @@ import { dbPool } from '@database/config.js';
 import { ApiError } from '@errors/errorHandler.js';
 import { logger } from '@loggers/logger.js';
 import { generateHashSecret, getCognitoIdentity } from 'helpers/helpers.js';
-import md5 from 'md5';
 
 /**
  * @async
@@ -27,7 +26,7 @@ import md5 from 'md5';
 export async function register({ firstName, lastName, email, roleId }: IRegisterRequest): Promise<IRegisterResponse> {
     const cognitoIdentity = getCognitoIdentity();
 
-    const password = md5(email);
+    const password = "#SocialSync@3249";
 
     const hashSecret = generateHashSecret(email);
 
