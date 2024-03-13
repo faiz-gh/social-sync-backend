@@ -19,7 +19,7 @@ router.put('/', EventController.updateEvent);
  * @route DELETE /event
  * @description Route for deleting an existing event
  */
-router.delete('/', EventController.deleteEvent);
+router.delete('/:id', EventController.deleteEvent);
 
 /**
  * @route GET /event/company/:id

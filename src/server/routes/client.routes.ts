@@ -19,7 +19,7 @@ router.put('/', ClientController.updateClient);
  * @route DELETE /client
  * @description Route for deleting an existing client
  */
-router.delete('/', ClientController.removeClient);
+router.delete('/:id', ClientController.removeClient);
 
 /**
  * @route GET /client/user/:userID

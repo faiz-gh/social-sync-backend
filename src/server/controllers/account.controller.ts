@@ -32,14 +32,14 @@ export async function createAccount(req: Request, res: Response, next: NextFunct
 export async function updateAccount(req: Request, res: Response, next: NextFunction) {
     try {
         RequestValidator(req, {
-            body: Joi.object({
+            query: Joi.object({
                 id: Joi.string().required(),
                 accountType: Joi.string().optional(),
                 accessToken: Joi.string().optional(),
             }),
         });
         const data = await AccountService.updateAccount(
-            req.body as IUpdateAccountRequest
+            req.query as unknown as IUpdateAccountRequest
         );
         res.json(data);
     } catch (error) {
@@ -54,12 +54,12 @@ export async function updateAccount(req: Request, res: Response, next: NextFunct
 export async function removeAccount(req: Request, res: Response, next: NextFunction) {
     try {
         RequestValidator(req, {
-            body: Joi.object({
+            params: Joi.object({
                 id: Joi.string().required(),
             }),
         });
         const data = await AccountService.removeAccount(
-            req.body as IDeleteAccountRequest
+            { id: req.params.id } as IDeleteAccountRequest
         );
         res.json(data);
     } catch (error) {

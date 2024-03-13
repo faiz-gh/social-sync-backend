@@ -19,7 +19,7 @@ router.put('/', AccountController.updateAccount);
  * @route DELETE /account
  * @description Route for deleting an existing account
  */
-router.delete('/', AccountController.removeAccount);
+router.delete('/:id', AccountController.removeAccount);
 
 /**
  * @route GET /account/client/:clientID
