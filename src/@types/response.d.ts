@@ -151,4 +151,13 @@ declare global {
     interface IGetEventsByCompanyResponse extends DefaultServiceResponse {
         data?: IEventTable[];
     }
+
+    interface IGetCompanyDashboardAnalyticsResponse extends DefaultServiceResponse {
+        data?: {
+            total_posts: number;
+            total_employees: number;
+            total_clients: number;
+            total_accounts: number;
+        };
+    }
 }

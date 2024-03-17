@@ -200,3 +200,8 @@ interface IGetFeedbackRequest {
 interface IGetFeedbacksByUserRequest {
     userId: string;
 }
+
+// Analytics Service
+interface IGetCompanyDashboardAnalyticsRequest {
+    companyId: string;
+}

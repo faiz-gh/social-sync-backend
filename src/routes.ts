@@ -6,6 +6,7 @@ import accountRoute from '@routes/account.routes';
 import postRoute from '@routes/post.routes';
 import eventRoute from '@routes/event.routes';
 import feedbackRoute from '@routes/feedback.routes';
+import analyticsRoute from '@routes/analytics.routes';
 import { NextFunction, Request, Response, Router } from 'express';
 
 const routes: Router = Router({ mergeParams: true });
@@ -58,5 +59,11 @@ routes.use('/event', eventRoute);
  * @description Route for feedback
  */
 routes.use('/feedback', feedbackRoute);
+
+/**
+ * @route /analytics
+ * @description Route for analytics
+ */
+routes.use('/analytics', analyticsRoute)
 
 export default routes;
