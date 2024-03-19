@@ -63,15 +63,19 @@ export async function getClientByCompany({ companyId }: IGetClientsByCompanyRequ
         const clients = await dbPool<IClientTable[]>`
             SELECT 
                 clt.*,
-                COUNT(acc.*) as total_accounts
+                COUNT(acc.*) as total_accounts,
+                emp.first_name || ' ' || emp.last_name as employee_name
             FROM
                 clients clt
                 LEFT JOIN accounts acc ON clt.id = acc.client_id AND acc.is_deleted = false
+                LEFT JOIN users emp ON clt.employee_id = emp.id AND emp.role_id = 3 AND emp.is_deleted = false
             WHERE
                 clt.company_id = ${companyId} 
                 AND clt.is_deleted = false
             GROUP BY 
-                clt.id
+                clt.id,
+                emp.first_name,
+                emp.last_name
         `;
         logger.silly('Clients fetched successfully');
 
@@ -90,15 +94,19 @@ export async function getClientByEmployee({ employeeId }: IGetClientsByEmployeeR
         const clients = await dbPool<IClientTable[]>`
             SELECT
                 clt.*,
-                COUNT(acc.*) as total_accounts
+                COUNT(acc.*) as total_accounts,
+                emp.first_name || ' ' || emp.last_name as employee_name
             FROM
                 clients clt
                 LEFT JOIN accounts acc ON clt.id = acc.client_id AND acc.is_deleted = false
+                LEFT JOIN users emp ON clt.employee_id = emp.id AND emp.role_id = 3 AND emp.is_deleted = false
             WHERE
                 clt.employee_id = ${employeeId} 
                 AND clt.is_deleted = false
             GROUP BY 
-                clt.id
+                clt.id,
+                emp.first_name,
+                emp.last_name
         `;
         logger.silly('Clients fetched successfully');
 

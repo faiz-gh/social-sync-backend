@@ -31,6 +31,7 @@ interface IClientTable {
     id?: string;
     company_id?: string;
     employee_id?: string;
+    employee_name?: string;
     name?: string;
     email?: string;
     created_date?: Date;

@@ -49,10 +49,10 @@ export async function register({ firstName, lastName, email, roleId }: IRegister
         }
 
         const [user] = await dbPool`INSERT INTO users ${dbPool(userObj)} RETURNING *`;
-        logger.silly('User created successfully, Email verification code sent to your email');
+        logger.silly('User created successfully');
 
         return {
-            message: 'User created successfully, Email verification code sent to your email',
+            message: 'User Signed Up Successfully',
             data: user,
         };
     } catch (error) {
@@ -112,7 +112,7 @@ export async function login({ email }: ILoginRequest): Promise<ILoginResponse> {
         logger.silly('User logged in successfully');
 
         return {
-            message: 'User logged in successfully',
+            message: 'User Email Validated, OTP sent to your email.',
             data: result
         };
     } catch (error) {
