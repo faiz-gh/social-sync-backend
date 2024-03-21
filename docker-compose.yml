@@ -4,7 +4,6 @@ services:
   # Main Application
   app:
     build: .
-    container_name: socialsync-app
     restart: unless-stopped
     ports:
       - "5500:5500"
