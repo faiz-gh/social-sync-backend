@@ -43,8 +43,11 @@ interface IClientTable {
 interface IAccountTable {
     id?: string;
     client_id?: string;
-    account_type?: string;
-    access_token?: string;
+    facebook_user_id?: string;
+    page_id?: string;
+    page_name?: string;
+    user_access_token?: string;
+    page_access_token?: string;
     created_date?: Date;
     last_modified?: Date;
     is_deleted?: boolean;

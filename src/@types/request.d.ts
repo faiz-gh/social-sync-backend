@@ -87,8 +87,10 @@ interface IGetClientsByEmployeeRequest {
 // Account Service
 interface ICreateAccountRequest {
     clientId: string;
-    accountType: string;
     accessToken: string;
+    facebookUserId: string;
+    pageId: string;
+    pageName: string;
 }
 
 interface IUpdateAccountRequest {

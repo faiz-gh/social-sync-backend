@@ -12,8 +12,10 @@ export async function createAccount(req: Request, res: Response, next: NextFunct
         RequestValidator(req, {
             body: Joi.object({
                 clientId: Joi.string().required(),
-                accountType: Joi.string().required(),
                 accessToken: Joi.string().required(),
+                facebookUserId: Joi.string().required(),
+                pageId: Joi.string().required(),
+                pageName: Joi.string().required(),
             }),
         });
         const data = await AccountService.createAccount(
@@ -25,27 +27,27 @@ export async function createAccount(req: Request, res: Response, next: NextFunct
     }
 }
 
-/**
- * @route PUT /account
- * @description Route for updating an existing account
- */
-export async function updateAccount(req: Request, res: Response, next: NextFunction) {
-    try {
-        RequestValidator(req, {
-            query: Joi.object({
-                id: Joi.string().required(),
-                accountType: Joi.string().optional(),
-                accessToken: Joi.string().optional(),
-            }),
-        });
-        const data = await AccountService.updateAccount(
-            req.query as unknown as IUpdateAccountRequest
-        );
-        res.json(data);
-    } catch (error) {
-        next(error);
-    }
-}
+// /**
+//  * @route PUT /account
+//  * @description Route for updating an existing account
+//  */
+// export async function updateAccount(req: Request, res: Response, next: NextFunction) {
+//     try {
+//         RequestValidator(req, {
+//             query: Joi.object({
+//                 id: Joi.string().required(),
+//                 accountType: Joi.string().optional(),
+//                 accessToken: Joi.string().optional(),
+//             }),
+//         });
+//         const data = await AccountService.updateAccount(
+//             req.query as unknown as IUpdateAccountRequest
+//         );
+//         res.json(data);
+//     } catch (error) {
+//         next(error);
+//     }
+// }
 
 /**
  * @route DELETE /account

@@ -9,11 +9,11 @@ const router: Router = Router();
  */
 router.post('/', AccountController.createAccount);
 
-/**
- * @route PUT /account
- * @description Route for updating an existing account
- */
-router.put('/', AccountController.updateAccount);
+// /**
+//  * @route PUT /account
+//  * @description Route for updating an existing account
+//  */
+// router.put('/', AccountController.updateAccount);
 
 /**
  * @route DELETE /account

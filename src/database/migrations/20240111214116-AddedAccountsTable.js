@@ -16,12 +16,14 @@ exports.setup = function(options, seedLink) {
 
 exports.up = function(db) {
   return db.runSql(`
-    CREATE TYPE account_type AS ENUM ('google', 'facebook', 'twitter');
     CREATE TABLE IF NOT EXISTS accounts (
       id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
       client_id uuid NOT NULL,
-      account_type character varying NOT NULL,
-      access_token character varying NOT NULL,
+      facebook_user_id character varying NOT NULL,
+      page_id character varying NOT NULL,
+      page_name character varying NOT NULL,
+      page_access_token character varying NOT NULL,
+      user_access_token character varying NOT NULL,
       created_date timestamp NOT NULL DEFAULT now(),
       last_modified timestamp NOT NULL DEFAULT now(),
       is_deleted boolean NOT NULL DEFAULT false
