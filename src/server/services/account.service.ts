@@ -23,6 +23,7 @@ export async function createAccount({ clientId, accessToken, pageId, pageName, f
 
         const accountObj: IAccountTable = {
             client_id: clientId,
+            facebook_user_id: facebookUserId,
             page_id: pageId,
             page_name: pageName,
             user_access_token: userAccessToken,
