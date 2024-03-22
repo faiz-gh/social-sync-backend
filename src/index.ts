@@ -8,6 +8,7 @@ import helmet from 'helmet';
 import swaggerJSDoc from 'swagger-jsdoc';
 import * as swaggerUi from 'swagger-ui-express';
 import v8 from 'v8';
+import morgan from 'morgan';
 
 import swaggerSpecs from './apiDocs/swagger.js';
 import routes from "./routes.js";
@@ -33,6 +34,11 @@ app.use(
         referrerPolicy: true,
         xssFilter: false,
     })
+);
+app.use(
+    morgan(
+        ':remote-addr :remote-user :date[clf] :method :url HTTP/:http-version :status :res[content-length] - :response-time ms :total-time ms'
+    )
 );
 
 // app.use(
