@@ -114,20 +114,20 @@ interface IGetAccountsByClientRequest {
 // Post Service
 interface ICreatePostRequest {
     accountId: string;
-    media?: string[];
-    location?: string;
     description: string;
+    image_url?: string;
+    location?: string;
     tags?: string[];
     postSchedule?: Date;
 }
 
 interface IUpdatePostRequest {
     id: string;
-    media: string[];
-    location: string;
     description: string;
-    tags: string[];
-    postSchedule: Date;
+    image_url?: string;
+    location?: string;
+    tags?: string[];
+    postSchedule?: Date;
 }
 
 interface IDeletePostRequest {

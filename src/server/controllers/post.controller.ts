@@ -12,11 +12,11 @@ export async function createPost(req: Request, res: Response, next: NextFunction
         RequestValidator(req, {
             body: Joi.object({
                 accountId: Joi.string().required(),
-                media: Joi.array().items(Joi.string()).optional(),
+                image_url: Joi.string().optional(),
                 location: Joi.string().optional(),
                 description: Joi.string().required(),
                 tags: Joi.array().items(Joi.string()).optional(),
-                postSchedule: Joi.date().optional(),
+                postSchedule: Joi.any().optional(),
             }),
         });
         const data = await PostService.createPost(

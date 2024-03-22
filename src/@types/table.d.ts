@@ -57,7 +57,9 @@ interface IAccountTable {
 interface IPostTable {
     id?: string;
     account_id?: string;
-    media?: string[];
+    account_name?: string;
+    page_post_id?: string;
+    image_url?: string;
     location?: string;
     description?: string;
     tags?: string[];

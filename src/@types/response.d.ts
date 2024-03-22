@@ -113,10 +113,7 @@ declare global {
 
     // Post Service
     interface ICreatePostResponse extends DefaultServiceResponse {
-        data?: {
-            post: IPostTable,
-            postResponse: unknown
-        };
+        data?: IPostTable;
     }
 
     interface IGetPostResponse extends DefaultServiceResponse {

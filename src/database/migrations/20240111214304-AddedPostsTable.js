@@ -19,10 +19,10 @@ exports.up = function(db) {
     CREATE TABLE IF NOT EXISTS posts (
       id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
       account_id uuid NOT NULL,
-      media character varying[] NOT NULL,
-      location character varying NOT NULL,
+      image_url character varying,
+      location character varying,
       description character varying NOT NULL,
-      tags character varying[] NOT NULL,
+      tags character varying[],
       post_schedule timestamp NOT NULL DEFAULT now(),
       created_date timestamp NOT NULL DEFAULT now(),
       last_modified timestamp NOT NULL DEFAULT now(),
