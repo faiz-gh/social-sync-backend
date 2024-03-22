@@ -131,6 +131,14 @@ declare global {
         data?: IPostTable[];
     }
 
+    interface IGetPostsByEmployeeResponse extends DefaultServiceResponse {
+        data?: IPostTable[];
+    }
+
+    interface IGetPostsByCompanyResponse extends DefaultServiceResponse {
+        data?: IPostTable[];
+    }
+
     // Event Service
     interface ICreateEventResponse extends DefaultServiceResponse {
         data?: IEventTable;

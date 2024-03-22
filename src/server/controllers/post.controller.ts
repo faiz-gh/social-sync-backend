@@ -87,3 +87,43 @@ export async function getPostsByClient(req: Request, res: Response, next: NextFu
         next(error);
     }
 }
+
+/**
+ * @route GET /post/company/:id
+ * @description Route for getting posts by company id
+ */
+export async function getPostsByCompany(req: Request, res: Response, next: NextFunction) {
+    try {
+        RequestValidator(req, {
+            params: Joi.object({
+                id: Joi.string().required(),
+            }),
+        });
+        const data = await PostService.getPostsByCompany(
+            { companyId: req.params.id } as IGetPostsByCompanyRequest
+        );
+        res.json(data);
+    } catch (error) {
+        next(error);
+    }
+}
+
+/**
+ * @route GET /post/employee/:id
+ * @description Route for getting posts by employee id
+ */
+export async function getPostsByEmployee(req: Request, res: Response, next: NextFunction) {
+    try {
+        RequestValidator(req, {
+            params: Joi.object({
+                id: Joi.string().required(),
+            }),
+        });
+        const data = await PostService.getPostsByEmployee(
+            { employeeId: req.params.id } as IGetPostsByEmployeeRequest
+        );
+        res.json(data);
+    } catch (error) {
+        next(error);
+    }
+}

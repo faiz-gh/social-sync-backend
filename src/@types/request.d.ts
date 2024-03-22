@@ -146,6 +146,14 @@ interface IGetPostsByClientRequest {
     clientId: string;
 }
 
+interface IGetPostsByEmployeeRequest {
+    employeeId: string;
+}
+
+interface IGetPostsByCompanyRequest {
+    companyId: string;
+}
+
 // Event Service
 interface ICreateEventRequest {
     companyId: string;

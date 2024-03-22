@@ -22,6 +22,18 @@ router.get('/account/:id', PostController.getPostsByAccount);
 router.get('/client/:id', PostController.getPostsByClient);
 
 /**
+ * @route GET /post/employee/:id
+ * @description Route for getting posts by employee id
+ */
+router.get('/employee/:id', PostController.getPostsByEmployee);
+
+/**
+ * @route GET /post/company/:id
+ * @description Route for getting posts by company id
+ */
+router.get('/company/:id', PostController.getPostsByCompany);
+
+/**
  * @route GET /post/:id
  * @description Route for getting post by id
  */

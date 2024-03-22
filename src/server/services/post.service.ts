@@ -99,3 +99,79 @@ export async function getPostsByClient({ clientId }: IGetPostsByClientRequest): 
         throw new ApiError(500, 'Failed to retrieve posts, please try again');
     }
 }
+
+export async function getPostsByEmployee({ employeeId }: IGetPostsByEmployeeRequest): Promise<IGetPostsByEmployeeResponse> {
+    try {
+        const posts = await dbPool<IPostTable[]>`SELECT
+                *
+            FROM
+                posts
+            WHERE
+                account_id IN (
+                    SELECT
+                        id
+                    FROM
+                        accounts
+                    WHERE
+                        client_id IN (
+                            SELECT
+                                id
+                            FROM
+                                clients
+                            WHERE
+                                employee_id = ${employeeId} 
+                                AND is_deleted = false
+                            )
+                        AND is_deleted = false
+                    ) 
+                AND is_deleted = false
+            `;
+        logger.silly('Posts retrieved successfully');
+
+        return {
+            message: 'Posts retrieved successfully',
+            data: posts
+        }
+    } catch (error) {
+        logger.error(`Failed to retrieve posts, please try again\n Error: ${error}`);
+        throw new ApiError(500, 'Failed to retrieve posts, please try again');
+    }
+}
+
+export async function getPostsByCompany({ companyId }: IGetPostsByCompanyRequest): Promise<IGetPostsByCompanyResponse> {
+    try {
+        const posts = await dbPool<IPostTable[]>`SELECT
+                *
+            FROM
+                posts
+            WHERE
+                account_id IN (
+                    SELECT
+                        id
+                    FROM
+                        accounts
+                    WHERE
+                        client_id IN (
+                            SELECT
+                                id
+                            FROM
+                                clients
+                            WHERE
+                                company_id = ${companyId} 
+                                AND is_deleted = false
+                            )
+                        AND is_deleted = false
+                    ) 
+                AND is_deleted = false
+            `;
+        logger.silly('Posts retrieved successfully');
+
+        return {
+            message: 'Posts retrieved successfully',
+            data: posts
+        }
+    } catch (error) {
+        logger.error(`Failed to retrieve posts, please try again\n Error: ${error}`);
+        throw new ApiError(500, 'Failed to retrieve posts, please try again');
+    }
+}
