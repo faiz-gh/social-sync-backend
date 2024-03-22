@@ -20,8 +20,8 @@ services:
       - "443:443"
     volumes:
       - ./conf.d/default.conf:/etc/nginx/conf.d/default.conf
-      - /etc/letsencrypt/live/marketingcompany.tech/fullchain.pem:/etc/nginx/ssl/fullchain.pem
-      - /etc/letsencrypt/live/marketingcompany.tech/privkey.pem:/etc/nginx/ssl/privkey.pem
+      - /etc/letsencrypt/live/marketingcompany.tech-0001/fullchain.pem:/etc/nginx/ssl/fullchain.pem
+      - /etc/letsencrypt/live/marketingcompany.tech-0001/privkey.pem:/etc/nginx/ssl/privkey.pem
       # Database
   db:
     image: 'postgres:16.1-alpine3.18'
